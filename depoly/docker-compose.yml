@@ -1,0 +1,31 @@
+version: "3.0"
+services:
+  trade:
+    container_name: "tradedb"
+    image: postgres:14.1-alpine
+    restart : always
+    environment:
+      POSTGRES_PASSWORD: tradedb
+      POSTGRES_USER: tradedb
+      POSTGRES_DB: tradedb
+    ports:
+      - "5001:5432"
+    networks:
+      - custom
+  user:
+    container_name: "userdb"
+    image: postgres:14.1-alpine
+    restart : always
+    environment:
+      POSTGRES_PASSWORD: userdb
+      POSTGRES_USER: userdb
+      POSTGRES_DB: userdb
+    ports:
+      - "5000:5432"
+    networks:
+      - custom
+networks:
+  custom:
+    driver: bridge
+
+ 
