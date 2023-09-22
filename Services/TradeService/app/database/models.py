@@ -1,9 +1,9 @@
-from sqlalchemy import MetaData, Column, Integer, String,Table, TIMESTAMP,JSON
+from sqlalchemy import MetaData, Column, Integer, String,Table, TIMESTAMP,JSON,ForeignKey
 from datetime import datetime
 
 metadata = MetaData()
 
-Geo_tag= Table(
+tags= Table(
     "tags",
     metadata,
     Column("id",Integer,primary_key=True),
@@ -21,6 +21,6 @@ trades = Table(
     Column("price",Integer, nullable=False),
     Column("currency",String, nullable=False),
     Column("created_at",TIMESTAMP, default=datetime.utcnow),
-    Column("geo_tag",Geo_tag, nullable=False),
-    Column("hide",bool,nullable=False)
+    Column("geo_tag_id",Integer,ForeignKey("tags.id")),
+    Column("hide",String,nullable=False)
 )
