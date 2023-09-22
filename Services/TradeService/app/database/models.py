@@ -1,26 +1,27 @@
 from sqlalchemy import MetaData, Column, Integer, String,Table, TIMESTAMP,JSON,ForeignKey
 from datetime import datetime
+from .database import Base
 
 metadata = MetaData()
 
-tags= Table(
-    "tags",
-    metadata,
-    Column("id",Integer,primary_key=True),
-    Column("Desciption",String,default=''),
-    Column("geo_tag",JSON)
-)
+class tags(Base):
+    __tablename__ = "tags"
+
+    id = Column("id",Integer,primary_key=True)
+    desciption = Column("desciption",String,default='')
+    geo_tag = Column("geo_tag",JSON)
 
 
-trades = Table(
-    "trades",
-    metadata,
-    Column("id",Integer, primary_key=True),
-    Column("buyer_id",Integer, primary_key=True),
-    Column("seller_id",Integer, primary_key=False),
-    Column("price",Integer, nullable=False),
-    Column("currency",String, nullable=False),
-    Column("created_at",TIMESTAMP, default=datetime.utcnow),
-    Column("geo_tag_id",Integer,ForeignKey("tags.id")),
-    Column("hide",String,nullable=False)
-)
+
+class trades(Base):
+    __tablename__ = "trades"
+
+    id = Column("id",Integer, primary_key=True)
+    buyer_id = Column("buyer_id",Integer)
+    seller_id = Column("seller_id",Integer)
+    price = Column("price",Integer, nullable=False)
+    currency = Column("currency",String, nullable=False)
+    description = Column("description",String,default='')
+    created_at = Column("created_at",TIMESTAMP, default=datetime.utcnow)
+    geo_tag_id = Column("geo_tag_id",Integer,ForeignKey("tags.id"))
+    hide = Column("hide",String)
