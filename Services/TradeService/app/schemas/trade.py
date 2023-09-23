@@ -15,6 +15,8 @@ class TagCreate(TagBase):
 class TradeBase(BaseModel):
     #buyer_id: int = Field(title='Идентификатор покупателя')
     #seller_id: int = Field(title='Идентификатор продавца')
+    #buyer_address: str = Field(title='Адрес покупателя',default='')
+    #seller_address: str = Field(title='Адрес продавца')
     price: int = Field(title='Цена', nullable=False)
     currency: str = Field(title='Валюта', nullable=False)
     description: str = Field(title='Описание', default='')

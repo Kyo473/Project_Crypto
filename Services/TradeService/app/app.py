@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
-from .schemas.trade import TagBase, Tag, TagCreate,TradeBase,Trade,TradeCreate
+from .schemas.trade import Trade,TradeCreate
 from sqlalchemy.orm import Session
 from .database import DB_INITIALIZER
 from . import crud

@@ -19,6 +19,8 @@ class trades(Base):
     id = Column("id",Integer, primary_key=True)
     buyer_id = Column("buyer_id",Integer)
     seller_id = Column("seller_id",Integer)
+    buyer_address = Column("buyer_address",String,default='')
+    seller_address = Column("seller_address",String)
     price = Column("price",Integer, nullable=False)
     currency = Column("currency",String, nullable=False)
     description = Column("description",String,default='')
