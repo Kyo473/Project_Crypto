@@ -1,13 +1,9 @@
 FROM python:3.11
+WORKDIR /src
 
-WORKDIR /app
+COPY ./requirements.txt /src/requirements.txt
 
-COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /src/requirements.txt
+COPY ./app /src/app
 
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY ./app /app/app
-
-EXPOSE 5000
-
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000","--reload"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]

@@ -9,23 +9,23 @@ services:
       POSTGRES_USER: tradedb
       POSTGRES_DB: tradedb
     ports:
-      - "5430:5432"
+      - "5432:5432"
     networks:
       - custom
-  # trade-service:
-  #   build:
-  #     context: ../Services/TradeService
-  #     dockerfile: ./DockerFile
-  #   environment:
-  #     - DB_HOST=db
-  #     - DB_PORT=5430
-  #     - DB_NAME=tradedb
-  #     - DB_USERS=tradedb
-  #     - DB_PASS=tradedb
-  #   ports:
-  #     - "5000:5000"
-  #   networks:
-  #     - custom
+  trade-service:
+    build:
+      context: ../Services/TradeService
+      dockerfile: ./Dockerfile
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=tradedb
+      - DB_USERS=tradedb
+      - DB_PASS=tradedb
+    ports:
+      - "5000:5000"
+    networks:
+      - custom
   # userdb:
   #   container_name: "userdb"
   #   image: postgres:14.1-alpine
