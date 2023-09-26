@@ -1,2 +1,6 @@
 API сервиса управления сделками
-Реализован на основе фреймворка fastapi-users
+
+формирование контейнеров app и db
+docker-compose -f docker-compose.yml up -d
+Url:
+http://localhost:5000/docs

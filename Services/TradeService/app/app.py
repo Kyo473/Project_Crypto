@@ -49,25 +49,25 @@ async def get_trade_list(
 async def get_device_info(
         TradeId: int, db: Session = Depends(get_db)
     ) -> Trade :
-    device = crud.get_trade(db, TradeId)
-    if device != None:
-        return device
+    trade = crud.get_trade(db, TradeId)
+    if trade != None:
+        return trade
     return JSONResponse(status_code=404, content={"message": "Item not found"})
 
 @app.put("/trades/{TradeId}", summary='Обновляет информацию о сделке')
 async def update_trade(
         TradeId: int, 
-        device: TradeCreate,
+        trade: TradeCreate,
         db: Session = Depends(get_db)
     ) -> Trade :
 
-    device = crud.update_trade(db, TradeId, device)
-    if device != None:
-        return device
+    trade = crud.update_trade(db, TradeId, trade)
+    if trade != None:
+        return trade
     return JSONResponse(status_code=404, content={"message": "Item not found"})
 
 @app.delete("/trades/{TradeId}", summary='Удаляет сделку из базы')
-async def delete_device(
+async def delete_trade(
         TradeId: int, db: Session = Depends(get_db)
     ) -> Trade :
     if crud.delete_trade(db, TradeId):
