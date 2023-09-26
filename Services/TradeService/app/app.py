@@ -15,7 +15,7 @@ SessionLocal = DB_INITIALIZER.init_database(f"postgresql://{DB_USERS}:{DB_PASS}@
 
 app = FastAPI(
     version='0.0.2',
-    title='Device Management Service'
+    title='Trade Management Service'
 )
 
 def get_db():
