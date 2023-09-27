@@ -38,7 +38,7 @@ async def create_trade(trade: TradeCreate, db: Session = Depends(get_db)) -> Tra
     summary='Возвращает список сделок',
     response_model=list[Trade]
 )
-async def get_trade_list(
+async def get_trades(
         db: Session = Depends(get_db),
         skip: int = 0,
         limit: int = 100
