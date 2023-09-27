@@ -46,7 +46,7 @@ async def get_trades(
     return crud.get_trades(db, skip, limit)
 
 @app.get("/trades/{TradeId}", summary='Возвращает информацию о сделке')
-async def get_device_info(
+async def get_trades_info(
         TradeId: int, db: Session = Depends(get_db)
     ) -> Trade :
     trade = crud.get_trade(db, TradeId)
