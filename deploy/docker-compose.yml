@@ -2,7 +2,7 @@ version: "3.0"
 services:
   Tradedb:
     container_name: "db"
-    image: postgres:14.1
+    image: postgis/postgis:13-master
     restart : always
     environment:
       POSTGRES_PASSWORD: tradedb

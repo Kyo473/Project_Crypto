@@ -1,4 +1,4 @@
-from .trade import TagBase, Tag, TagCreate,TradeBase,Trade,TradeCreate
+from .trade import TradeBase,Trade,TradeCreate,TradeUpdate,TradeDelete
 
 
-__all__ = [TagBase, Tag, TagCreate,TradeBase,Trade,TradeCreate]
+__all__ = [TradeBase,Trade,TradeCreate,TradeUpdate,TradeDelete]

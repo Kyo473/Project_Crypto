@@ -1,18 +1,20 @@
 import typing
+import uuid
 from sqlalchemy.orm import Session
-from .database import models
-from . import schemas
+from .models import trades
+from .schemas import TradeBase,Trade,TradeCreate,TradeDelete,TradeUpdate
 
-def create_trade(
-        db: Session, trade: schemas.TradeCreate
-    ) -> models.trades:
+def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
     '''
     Создает новое объявление сделки в БД
     '''
-    db_trade = models.trades(
+    db_trade = trades(
+        id = uuid.uuid4(),
         price = trade.price,
         currency = trade.currency,
-        description = trade.description
+        description = trade.description,
+        lat = trade.lat,
+        lon = trade.lon
     )
 
     db.add(db_trade)
@@ -20,51 +22,38 @@ def create_trade(
     db.refresh(db_trade)
     return db_trade
 
-def get_trades(
-        db: Session, skip: int = 0, limit: int = 100
-    ) -> typing.List[models.trades]:
+def get_all_trades(db: Session, skip: int = 0, limit: int = 100) -> typing.List[trades]:
     '''
     Возвращает инфомрмацию о всех сделках 
     '''
-    return  db.query(models.trades) \
-            .offset(skip) \
-            .limit(limit) \
-            .all()
+    return db.query(trades).all()
 
-def get_trade(
-        db: Session, trade_id: int
-    ) -> models.trades:
+def get_trade(TradeId: uuid.UUID, db: Session) -> Trade:
     '''
-    Возвращает информацию о конкретной сделке
-    '''
-    return  db.query(models.trades) \
-            .filter(models.trades.id == trade_id) \
-            .first()
+    Возвращает инфомрмацию о сделке
+    ''' 
+    return db.query(trades).filter(trades.id == TradeId).first()
 
-def update_trade(
-        db: Session, trade_id: int, trade: schemas.TradeCreate
-    ) -> models.trades:
+def update_trade( TradeId: uuid.UUID, trade: TradeUpdate ,db: Session) -> TradeUpdate:
     '''
     Обновляет информацию о сделке
     '''
-    result =    db.query(models.trades) \
-                .filter(models.trades.id == trade_id) \
+    result =    db.query(trades) \
+                .filter(trades.id == TradeId) \
                 .update(trade.dict())
     db.commit()
 
     if result == 1:
-        return get_trade(db, trade_id)
+        return get_trade(TradeId, db)
     return None
 
 
-def delete_trade(
-        db: Session, trade_id: int
-    ) -> bool:
+def delete_trade(TradeId: uuid.UUID,db: Session) -> TradeDelete:
     '''
     Удаляет информацию о сделке
     '''
-    result =    db.query(models.trades) \
-                .filter(models.trades.id == trade_id) \
+    result =    db.query(trades) \
+                .filter(trades.id == TradeId) \
                 .delete()
     db.commit()
     return result == 1
