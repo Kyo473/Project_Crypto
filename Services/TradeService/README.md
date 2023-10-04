@@ -29,3 +29,8 @@ Parameters:id
 delete /trades/{TradeId} Удаляет сделку из базы
 Parameters:id 
 
+Конфигурация
+
+Переменная - POSTGRES_DSN	
+Назначение - Подключение к PostgreSQL
+Значение по-умолчанию - postgresql://user:pass@localhost:5432/foobar
