@@ -1,6 +1,6 @@
 version: "3.0"
 services:
-  db:
+  Tradedb:
     container_name: "db"
     image: postgres:14.1-alpine
     restart : always
@@ -17,11 +17,7 @@ services:
       context: ../Services/TradeService
       dockerfile: ./Dockerfile
     environment:
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_NAME=tradedb
-      - DB_USERS=tradedb
-      - DB_PASS=tradedb
+      - POSTGRES_DSN=postgresql://tradedb:tradedb@Tradedb:5432/tradedb
     ports:
       - "5000:5000"
     networks:

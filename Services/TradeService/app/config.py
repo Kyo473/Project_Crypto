@@ -1,10 +1,15 @@
-from dotenv import load_dotenv
-import os 
+from pydantic import PostgresDsn,Field
+from pydantic_settings import BaseSettings
 
-load_dotenv()
+class Config(BaseSettings):
+    postgres_dsn: PostgresDsn = Field(
+        default='postgresql://user:pass@localhost:5432/foobar',
+        env='POSTGRES_DSN',
+        alias='POSTGRES_DSN'
+    )
+    class Config:
+        env_file = ".env"
 
-DB_HOST=os.environ.get("DB_HOST")
-DB_PORT=os.environ.get("DB_PORT")
-DB_USERS=os.environ.get("DB_USERS")
-DB_PASS=os.environ.get("DB_PASS")
-DB_NAME=os.environ.get("DB_NAME")
+
+def load_config() -> Config:
+    return Config()

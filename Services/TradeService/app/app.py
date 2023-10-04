@@ -4,14 +4,15 @@ from .schemas.trade import Trade,TradeCreate
 from sqlalchemy.orm import Session
 from .database import DB_INITIALIZER
 from . import crud
-from .config import DB_USERS,DB_PASS,DB_HOST,DB_HOST,DB_PORT,DB_NAME
+from . import config
 import typing
 from fastapi.logger import logger
 
+cfg: config.Config = config.load_config()
 
 # init database
 logger.info('Initializing database...')
-SessionLocal = DB_INITIALIZER.init_database(f"postgresql://{DB_USERS}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+SessionLocal = DB_INITIALIZER.init_database(str(cfg.postgres_dsn))
 
 app = FastAPI(
     version='0.0.2',

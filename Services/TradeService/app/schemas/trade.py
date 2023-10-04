@@ -20,7 +20,7 @@ class TradeBase(BaseModel):
     price: int = Field(title='Цена', nullable=False)
     currency: str = Field(title='Валюта', nullable=False)
     description: str = Field(title='Описание', default='')
-    created_at: Any = Field(title='Дата создания', default=datetime.utcnow)
+    #created_at: Any = Field(title='Дата создания', default=datetime.utcnow)
     #geo_tag_id: int = Field(title='Идентификатор гео-тега')
     #hide: str = Field(title='Скрыто', nullable=False)
 
