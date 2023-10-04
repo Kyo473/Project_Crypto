@@ -2,7 +2,7 @@ version: "3.0"
 services:
   Tradedb:
     container_name: "db"
-    image: postgres:14.1-alpine
+    image: postgres:14.1
     restart : always
     environment:
       POSTGRES_PASSWORD: tradedb
@@ -22,6 +22,8 @@ services:
       - "5000:5000"
     networks:
       - custom
+    depends_on:
+      - Tradedb
   # userdb:
   #   container_name: "userdb"
   #   image: postgres:14.1-alpine
