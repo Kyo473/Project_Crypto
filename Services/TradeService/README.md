@@ -1,7 +1,11 @@
 API сервиса управления сделками
 
-формирование контейнеров app и db
-docker-compose -f docker-compose.yml up -d
+Команды
+Запуск проекта из директории
+docker-compose  -f deploy/docker-compose.yaml up -d
+Остановка проекта из директории
+docker-compose  -f deploy/docker-compose.yaml stop
+
 Url:
 http://localhost:5000/docs
 
@@ -10,8 +14,7 @@ Request body Добавляет сделку в базу
 {
   "price": 0,
   "currency": "string",
-  "description": "",
-  "created_at": "string"
+  "description": ""
 }
 
 get /trades Возвращает список сделок
@@ -25,3 +28,4 @@ Parameters:id
 
 delete /trades/{TradeId} Удаляет сделку из базы
 Parameters:id 
+
