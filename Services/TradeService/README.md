@@ -1,36 +1,29 @@
-API сервиса управления сделками
+# Управление сделками - API Сервис
 
-Команды
-Запуск проекта из директории
-docker-compose  -f deploy/docker-compose.yaml up -d
-Остановка проекта из директории
-docker-compose  -f deploy/docker-compose.yaml stop
+Этот проект представляет собой API сервис для управления сделками. С ним вы можете добавлять, получать, обновлять и удалять информацию о сделках. Проект использует PostgreSQL в качестве базы данных.
 
-Url:
-http://localhost:5000/docs
+## Запуск проекта
+### Для запуска проекта из директории выполните следующие команды:
 
-post /trade
-Request body Добавляет сделку в базу
-{
-  "price": 0,
-  "currency": "string",
-  "description": ""
-}
+```bash
+docker-compose -f deploy/docker-compose.yaml up -d
 
-get /trades Возвращает список сделок
-Parameters:range
+### Для остановки проекта используйте:
 
-get /trades/{TradeId} Возвращает информацию о сделке
-Parameters:id 
+```bash
+docker-compose -f deploy/docker-compose.yaml stop
 
-put /trades/{TradeId} Обновляет информацию о сделке
-Parameters:id 
+## API Управления сделками :
+     - `POST` **/trade** - создание новой сделки
+     - `GET` **/trades**  - Получение всех сделок
+     - `GET` **/trades/{TradeId}** - Получение конкретной сделки
+     - `PUT` **/trades/{TradeId}** - Обновление конкретной сделки
+     - `DELETE` **/trades/{TradeId}** - Удаление сделки
+     - `GET` **/point_in_range/** - Возвращает информацию о сдлках в радиусе
+     - `GET` **/nearest** - Поиск ближайщей сделки
+     - `GET` **/visualize** - Отображение сделок на карте
 
-delete /trades/{TradeId} Удаляет сделку из базы
-Parameters:id 
-
-Конфигурация
-
-Переменная - POSTGRES_DSN	
-Назначение - Подключение к PostgreSQL
-Значение по-умолчанию - postgresql://user:pass@localhost:5432/foobar
+# Конфигурация
+| Переменная    | Назначение                      | Значение по-умолчанию                        |
+| -----------   | -----                           | ---                                          |
+| POSTGRES_DSN  | Строка подключения к PostgreSQL | postgresql://user:pass@localhost:5432/foobar |

@@ -58,7 +58,7 @@ async def delete_trade(TradeId: uuid.UUID, db: Session = Depends(get_db)) -> Tra
         return JSONResponse(status_code=200, content={"message": "Item successfully deleted"})
     return JSONResponse(status_code=404, content={"message": "Item not found"})
 
-@app.get("/point_in_range/",tags=["Geo func"], summary='Возвращает информацию о метках в радиусе')
+@app.get("/point_in_range/",tags=["Geo func"], summary='Возвращает информацию о сдлках в радиусе')
 async def get_spots_radius(lat: float, lon: float,radius: float,db:Session = Depends(get_db)):
     points = crud.point_in_range(lat=lat,lon=lon,radius=radius,db=db)
 
@@ -74,7 +74,7 @@ async def find_nearest(lat: float, lon: float,db:Session = Depends(get_db)):
         return nearest
     return JSONResponse(status_code=404, content={"message":"No points found within the given radius"})
 
-@app.get("/visualize" ,tags=["Geo func"])
+@app.get("/visualize" ,tags=["Geo func"],summary="Отображение сделок на карте")
 async def visualize_data(db: Session = Depends(get_db)):
     crud.create_map(db=db)
     return HTMLResponse(content=open("map.html").read(), status_code=200)

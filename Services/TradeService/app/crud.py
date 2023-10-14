@@ -2,7 +2,6 @@ import typing
 import uuid
 from sqlalchemy.orm import Session
 from .models import trades
-from fastapi.responses import RedirectResponse
 from .schemas import Trade,TradeCreate,TradeDelete,TradeUpdate
 from shapely.geometry import Point
 from geoalchemy2 import functions as geofunc
