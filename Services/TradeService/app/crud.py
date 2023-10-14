@@ -2,11 +2,12 @@ import typing
 import uuid
 from sqlalchemy.orm import Session
 from .models import trades
-from fastapi.responses import JSONResponse
+from fastapi.responses import RedirectResponse
 from .schemas import Trade,TradeCreate,TradeDelete,TradeUpdate
 from shapely.geometry import Point
 from geoalchemy2 import functions as geofunc
 from geoalchemy2 import WKTElement
+import folium
 from geoalchemy2.shape import to_shape
 
 def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
@@ -93,3 +94,18 @@ def find_nearest(lat: float, lon: float,db:Session):
     shapely_point = to_shape(nearest.geo_tag)
     result = {"id_trade":nearest.id, "latitude": shapely_point.x, "longitude": shapely_point.y}
     return result
+
+def create_map(db:Session):
+    """
+    Отображает метки на карте
+    """
+    geo_data = db.query(trades).all()
+    map = folium.Map(location=[0, 0], zoom_start=2)
+
+    for point in geo_data:
+        shapely_point = to_shape(point.geo_tag)
+        latitude = shapely_point.x
+        longitude = shapely_point.y
+        folium.Marker([latitude, longitude]).add_to(map)
+    map.save("map.html")
+    return map

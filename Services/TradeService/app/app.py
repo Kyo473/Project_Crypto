@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse,HTMLResponse
 from sqlalchemy.orm import Session
 from .database import DB_INITIALIZER
 from .schemas import TradeBase,Trade,TradeCreate,TradeDelete,TradeUpdate
@@ -73,3 +73,12 @@ async def find_nearest(lat: float, lon: float,db:Session = Depends(get_db)):
     if nearest !=None:
         return nearest
     return JSONResponse(status_code=404, content={"message":"No points found within the given radius"})
+
+@app.get("/visualize" ,tags=["Geo func"])
+async def visualize_data(db: Session = Depends(get_db)):
+    crud.create_map(db=db)
+    return HTMLResponse(content=open("map.html").read(), status_code=200)
+    # return RedirectResponse(url="/map")
+# @app.get("/map",tags=["Geo func"])
+# async def show_map():
+#     return HTMLResponse(content=open("map.html").read(), status_code=200)
