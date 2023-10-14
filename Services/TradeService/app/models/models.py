@@ -18,6 +18,6 @@ class trades(Base):
     created_at = Column(TIMESTAMP, default=datetime.utcnow)
     lat = Column(Float)
     lon = Column(Float)
-    geo_tag = Column(Geometry('POINT'))
+    geo_tag = Column(Geometry('POINT', srid=4326))
     hide = Column(String, default='Open')
     

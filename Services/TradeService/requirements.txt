@@ -8,3 +8,4 @@ asyncpg==0.28.0
 pydantic-settings==2.0.3
 GeoAlchemy2==0.14.1
 geojson==3.0.1
+shapely==2.0.2
