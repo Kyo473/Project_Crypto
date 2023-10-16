@@ -37,7 +37,7 @@
 
     let client_id = Date.now()
     document.querySelector("#ws-id").textContent = client_id;
-    RoomID = "264b3d31-1b43-4ef6-a21d-bf66b3d30b72";
+    RoomID = "444b3d31-1b43-4ef6-a21d-bf66b3d30b72";
     let ws = new WebSocket(`ws://localhost:8000/ws/${RoomID}/${client_id}`);
     ws.onmessage = function (event) {
         appendMessage(event.data)

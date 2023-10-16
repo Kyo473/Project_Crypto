@@ -19,7 +19,7 @@ logging.basicConfig(
 
 app_config: config.Config = config.load_config()
 app = FastAPI()
-
+room_managers = {}
 class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
@@ -59,16 +59,23 @@ async def get_last_messages(session: AsyncSession = Depends(get_async_session),)
     return messages.scalars().all()
 
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+
+@app.websocket("/ws/{RoomID}/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, RoomID: uuid.UUID, client_id: int):
+    # Создайте или получите ConnectionManager для данной комнаты
+    if RoomID not in room_managers:
+        room_managers[RoomID] = ConnectionManager()
+
+    manager = room_managers[RoomID]
+
     await manager.connect(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            await manager.broadcast(f"Client #{client_id} says: {data}", add_to_db=False)
+            await manager.broadcast(f"Client #{client_id} in Room {RoomID} says: {data}", add_to_db=False)
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left the chat", add_to_db=False)
+        await manager.broadcast(f"Client #{client_id} in Room {RoomID} left the chat", add_to_db=False)
 
 
 
