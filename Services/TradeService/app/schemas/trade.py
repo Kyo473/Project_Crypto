@@ -2,13 +2,17 @@ from pydantic import BaseModel, Field, UUID4
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+
 class Currency(str,Enum):
     Bitcoin = "BTC"
     Matic = "MATIC"
     USDT = "USDT"
-class Hide(str,Enum):
-    Open = "Open"
-    Close = "Close"
+class Status(str,Enum):
+    Create = "Create"
+    Pending = "Pending"
+    Successful = "Successful"
+    Appilation = "Appilation"
+    Error = "Error"
     
 
 class TradeBase(BaseModel):
@@ -22,7 +26,7 @@ class TradeBase(BaseModel):
     created_at: datetime = Field(title='Дата создания', default=datetime.utcnow())
     lat: float
     lon: float
-    hide: Hide = Field(title='Скрыто', default='Open')
+    hide: Status = Field(title='Скрыто', default='Create')
 
 class Trade(TradeBase):
     id: UUID4 = Field(title='Идентификатор сделки', default=None)

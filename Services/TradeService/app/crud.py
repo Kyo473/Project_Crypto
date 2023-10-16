@@ -20,6 +20,7 @@ def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
         price = trade.price,
         currency = trade.currency,
         description = trade.description,
+        hide  = trade.hide,
         lat = trade.lat,
         lon = trade.lon,
         geo_tag = geo_point
@@ -46,9 +47,7 @@ def update_trade( TradeId: uuid.UUID, trade: TradeUpdate ,db: Session) -> TradeU
     '''
     Обновляет информацию о сделке
     '''
-    result =    db.query(trades) \
-                .filter(trades.id == TradeId) \
-                .update(trade.dict())
+    result =    db.query(trades).filter(trades.id == TradeId).update(trade.dict())
     db.commit()
 
     if result == 1:
@@ -91,7 +90,7 @@ def find_nearest(lat: float, lon: float,db:Session):
         .first()
     
     shapely_point = to_shape(nearest.geo_tag)
-    result = {"id_trade":nearest.id, "latitude": shapely_point.x, "longitude": shapely_point.y}
+    result = {"id_trade":nearest.id, "latitude": shapely_point.lon, "longitude": shapely_point.lat}
     return result
 
 def create_map(db:Session):

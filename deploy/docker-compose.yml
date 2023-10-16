@@ -1,7 +1,7 @@
 version: "3.0"
 services:
   Tradedb:
-    container_name: "db"
+    container_name: "Tradedb"
     image: postgis/postgis:13-master
     restart : always
     environment:
@@ -24,6 +24,30 @@ services:
       - custom
     depends_on:
       - Tradedb
+  Chatdb:
+    container_name: "Chatdb"
+    image: postgres:14.1-alpine
+    restart : always
+    environment:
+      POSTGRES_PASSWORD: chatdb
+      POSTGRES_USER: chatdb
+      POSTGRES_DB: chatdb
+    ports:
+      - "5433:5432"
+    networks:
+      - custom
+  chat-service:
+    build:
+      context: ../Services/ChatService
+      dockerfile: ./Dockerfile
+    environment:
+      - POSTGRES_DSN=postgresql://chatdb:chatdb@Chatdb:5432/chatdb
+    ports:
+      - "5001:5001"
+    networks:
+      - custom
+    depends_on:
+      - Chatdb
   # userdb:
   #   container_name: "userdb"
   #   image: postgres:14.1-alpine
