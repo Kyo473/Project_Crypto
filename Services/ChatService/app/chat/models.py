@@ -1,21 +1,26 @@
 from sqlalchemy import Column, String,TIMESTAMP,Float,UUID,ForeignKey
-from ..database import Base
+from . import database
 from datetime import datetime
+from typing import AsyncGenerator
+from sqlalchemy.ext.asyncio import AsyncSession
 import uuid
 
-class ChatRoom(Base):
+class ChatRoom(database.BASE):
     __tablename__ = 'chats'
-
+    
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
     seller_id = Column(UUID) 
     buyer_id = Column(UUID) 
     
-class Message(Base):
+class Messages(database.BASE):
     __tablename__ = 'messages'
-
+    
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    text = Column(String)
+    message = Column(String)
     send_at = Column(TIMESTAMP, default=datetime.utcnow)
     sender_id = Column(UUID, primary_key=True)
     chat_id = Column(UUID, ForeignKey('chats.id'))
 
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with database.initializer.async_session_maker() as session:
+        yield session

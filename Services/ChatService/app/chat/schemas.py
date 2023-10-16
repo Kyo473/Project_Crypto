@@ -12,15 +12,15 @@ class ChatCreate(ChatBase):
 class ChatRead(ChatBase):
     id: UUID4
 
-class MessageBase(BaseModel):
-    text: str
+class MessagesBase(BaseModel):
+    message: str
     sender_id: uuid.UUID
     chat_id: uuid.UUID
 
-class MessageCreate(MessageBase):
+class MessagesCreate(MessagesBase):
     send_at: datetime
 
-class MessageRead(MessageBase):
+class MessagesRead(MessagesBase):
     id: UUID4
     
 

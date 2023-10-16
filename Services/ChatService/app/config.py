@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Config(BaseSettings):
     postgres_dsn: PostgresDsn = Field(
-        default='postgresql://user:pass@localhost:5432/foobar',
+        default='postgresql+asyncpg://user:pass@localhost:5432/foobar',
         env='POSTGRES_DSN',
         alias='POSTGRES_DSN'
     )
