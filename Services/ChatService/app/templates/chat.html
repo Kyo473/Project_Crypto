@@ -22,32 +22,32 @@
     }
 
     function connectToWebSocket() {
-        const roomId = document.getElementById("roomIdInput").value;
-        const clientId = document.getElementById("clientIdInput").value;
-        if (!roomId) {
-            appendMessage("Room ID is required.");
-            return;
-        }
-
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            appendMessage("Already connected to a session.");
-            return;
-        }
-
-        ws = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId}/${clientId || Date.now()}`);
-        ws.onopen = function () {
-            appendMessage("Connected to the session.");
-            getLastMessages();
-        };
-
-        ws.onmessage = function (event) {
-            appendMessage(event.data);
-        };
-
-        ws.onerror = function () {
-            appendMessage("Connection error.");
-        };
+    const roomId = document.getElementById("roomIdInput").value;
+    const clientId = document.getElementById("clientIdInput").value;
+    if (!roomId) {
+        appendMessage("Room ID is required.");
+        return;
     }
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        appendMessage("Already connected to a session.");
+        return;
+    }
+
+    ws = new WebSocket(`ws://127.0.0.1:8000/ws/${roomId}/${clientId || Date.now()}`);
+    ws.onopen = function () {
+        appendMessage("Connected to the session.");
+        getLastMessages(roomId); // Передайте ID комнаты
+    };
+
+    ws.onmessage = function (event) {
+        appendMessage(event.data);
+    };
+
+    ws.onerror = function () {
+        appendMessage("Connection error.");
+    };
+}
 
     function sendMessage(event) {
         if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -66,18 +66,18 @@
         event.preventDefault();
     }
 
-    async function getLastMessages() {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            const url = 'http://localhost:8000/chat/last_messages';
-            const response = await fetch(url, {
-                method: 'GET'
-            });
-            const messages = await response.json();
-            appendMessage("Previous 5 messages:");
-            messages.forEach(msg => {
-                appendMessage(msg.message);
-            });
-            appendMessage("New messages:");
-        }
+    async function getLastMessages(roomId) { 
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        const url = `http://localhost:8000/last_messages/${roomId}`; 
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+        const messages = await response.json();
+        appendMessage("Previous messages:");
+        messages.forEach(msg => {
+            appendMessage(msg.message);
+        });
+        appendMessage("New messages:");
     }
+}
 </script>

@@ -10,6 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.chat.models import ChatRoom,Messages,get_async_session
 from app import chat,config
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 # setup logging
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -19,6 +20,13 @@ logging.basicConfig(
 templates = Jinja2Templates(directory="app/templates")
 app_config: config.Config = config.load_config()
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Разрешите запросы с любых источников
+    allow_credentials=True,
+    allow_methods=["*"],  # Разрешите все HTTP-методы
+    allow_headers=["*"],  # Разрешите все заголовки
+)
 room_managers = {}
 class ConnectionManager:
     def __init__(self):
@@ -53,9 +61,14 @@ class ConnectionManager:
 
 manager = ConnectionManager()
 
-@app.get("/last_messages")
-async def get_last_messages(session: AsyncSession = Depends(get_async_session),) -> List[MessagesRead]:
-    query = select(Messages).order_by(Messages.id.desc()).limit(20)
+@app.get("/last_messages/{RoomID}")
+async def get_last_messages(RoomID: uuid.UUID, session: AsyncSession = Depends(get_async_session)) -> List[MessagesRead]:
+    query = (
+        select(Messages)
+        .filter(Messages.chat_id == RoomID)  
+        .order_by(Messages.send_at.desc())  
+        .limit(20)
+    )
     messages = await session.execute(query)
     return messages.scalars().all()
 
