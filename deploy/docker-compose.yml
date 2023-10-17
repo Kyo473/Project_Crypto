@@ -41,7 +41,7 @@ services:
       context: ../Services/ChatService
       dockerfile: ./Dockerfile
     environment:
-      - POSTGRES_DSN=postgresql://chatdb:chatdb@Chatdb:5432/chatdb
+      - POSTGRES_DSN=postgresql+asyncpg://chatdb:chatdb@Chatdb:5432/chatdb
     ports:
       - "5001:5001"
     networks:

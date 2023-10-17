@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine,AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import DeclarativeBase
 
@@ -11,7 +11,7 @@ class DatabaseInitializer():
     async def init_database(self, postgres_dsn):
         engine = create_async_engine(postgres_dsn)
         self.__async_session_maker = async_sessionmaker(
-            engine, expire_on_commit=False
+            engine,class_=AsyncSession, expire_on_commit=False
         )
         async with engine.begin() as conn:
             await conn.run_sync(self.__base.metadata.create_all)

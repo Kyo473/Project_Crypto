@@ -16,12 +16,18 @@ class MessagesBase(BaseModel):
     message: str
     sender_id: uuid.UUID
     chat_id: uuid.UUID
+    class Config:
+        from_attributes = True
 
 class MessagesCreate(MessagesBase):
     send_at: datetime
+    class Config:
+        from_attributes = True
 
 class MessagesRead(MessagesBase):
     id: UUID4
+    class Config:
+        from_attributes = True
     
 
 

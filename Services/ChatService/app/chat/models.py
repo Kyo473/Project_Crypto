@@ -16,10 +16,10 @@ class Messages(database.BASE):
     __tablename__ = 'messages'
     
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    message = Column(String)
     send_at = Column(TIMESTAMP, default=datetime.utcnow)
+    message = Column(String)
     sender_id = Column(UUID, primary_key=True)
-    chat_id = Column(UUID, ForeignKey('chats.id'))
+    chat_id = Column(UUID)
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
     async with database.initializer.async_session_maker() as session:
