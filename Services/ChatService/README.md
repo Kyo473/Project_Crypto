@@ -19,6 +19,10 @@ docker-compose -f deploy/docker-compose.yaml stop
      - `GET` **/message/{MessageID}**  - получение сообщения из БД
      - `POST` **/chatroom** - создание нового чата 
      - `GET` **/chatroom/{RoomID}**  - Возвращает информацию о чате
+     - `GET` **/chat**  - Открывает html с чатом пользователей
+     - `WS` **/ws/{RoomID}/{client_id}**  - Эндпоинт для подключения к чату
+     - `GET` **/last_messages/{RoomID}**  - Получение прошлых сообщений в чате и БД по её RoomID
+     
 
 # Конфигурация
 | Переменная    | Назначение                      | Значение по-умолчанию                        |
