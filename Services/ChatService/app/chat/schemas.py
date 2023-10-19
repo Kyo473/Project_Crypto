@@ -11,6 +11,8 @@ class ChatCreate(ChatBase):
 
 class ChatRead(ChatBase):
     id: UUID4
+    seller_id: uuid.UUID
+    buyer_id: uuid.UUID
 
 class MessagesBase(BaseModel):
     message: str

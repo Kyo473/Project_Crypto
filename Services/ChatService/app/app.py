@@ -96,7 +96,7 @@ def get_chat_page(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request})
 
 @app.post("/message", status_code=201, tags=["Message"], response_model=MessagesCreate, summary='Добавляет сообщение в базу')
-async def create_message(message: MessagesCreate, session: AsyncSession  = Depends(get_async_session)) -> MessagesCreate:
+async def create_message(message: MessagesCreate, session: AsyncSession  = Depends(get_async_session)) -> MessagesRead:
     return await crud.create_message(session=session, message=message)
    
 
@@ -107,13 +107,13 @@ async def get_message(MessageID: uuid.UUID, session: AsyncSession  = Depends(get
         return message
     return await JSONResponse(status_code=404, content={"message": "Item not found"})
 
-@app.post("/chatroom",tags=["ChatRoom"], status_code=201, response_model=ChatCreate,summary='Создает чат')
+@app.post("/chatroom",tags=["ChatRoom"], status_code=201, response_model=ChatRead,summary='Создает чат')
 async def create_chat(chat: ChatCreate, session: AsyncSession  = Depends(get_async_session)) -> ChatCreate :
     return await crud.create_chat(session=session, chat=chat)
 
 @app.get("/chatroom/{RoomID}",tags=["ChatRoom"], summary='Возвращает информацию о чате')
 async def get_chat(RoomID: uuid.UUID, session: AsyncSession  = Depends(get_async_session)) -> ChatRead :
-    chat = crud.get_chat(RoomID,session)
+    chat = await crud.get_chat(RoomID,session)
     if chat != None:
         return chat
     return await JSONResponse(status_code=404, content={"ChatRoom:": "Item not found"})
