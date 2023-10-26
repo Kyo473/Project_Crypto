@@ -57,7 +57,7 @@ services:
       POSTGRES_USER: userdb
       POSTGRES_DB: userdb
     ports:
-      - "5034:5432"
+      - "5434:5432"
     networks:
       - custom
   user-service:
