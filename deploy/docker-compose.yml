@@ -48,18 +48,18 @@ services:
       - custom
     depends_on:
       - Chatdb
-  # userdb:
-  #   container_name: "userdb"
-  #   image: postgres:14.1-alpine
-  #   restart : always
-  #   environment:
-  #     POSTGRES_PASSWORD: userdb
-  #     POSTGRES_USER: userdb
-  #     POSTGRES_DB: userdb
-  #   ports:
-  #     - "5000:5432"
-  #   networks:
-  #     - custom
+  userdb:
+    container_name: "userdb"
+    image: postgres:14.1-alpine
+    restart : always
+    environment:
+      POSTGRES_PASSWORD: userdb
+      POSTGRES_USER: userdb
+      POSTGRES_DB: userdb
+    ports:
+      - "5034:5432"
+    networks:
+      - custom
 networks:
   custom:
     driver: bridge
