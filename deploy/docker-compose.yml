@@ -48,7 +48,7 @@ services:
       - custom
     depends_on:
       - Chatdb
-  userdb:
+  Userdb:
     container_name: "userdb"
     image: postgres:14.1-alpine
     restart : always
@@ -60,6 +60,18 @@ services:
       - "5034:5432"
     networks:
       - custom
+  user-service:
+    build:
+      context: ../Services/UserService
+      dockerfile: ./Dockerfile
+    environment:
+      - POSTGRES_DSN=postgresql+asyncpg://userdb:userdb@Userdb:5432/userdb
+    ports:
+      - "5002:5002"
+    networks:
+      - custom
+    depends_on:
+      - Userdb
 networks:
   custom:
     driver: bridge
