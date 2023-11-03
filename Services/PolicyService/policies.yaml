@@ -1,0 +1,44 @@
+services:
+    - name: trade-service
+      entrypoint: http://trade-service:5000/
+      inject_token_in_swagger: True
+    - name: chat-service
+      entrypoint: http://chat-service:5001/
+      inject_token_in_swagger: True
+    - name: user-service
+      entrypoint: http://user-service:5002/
+model: |
+    [request_definition]
+    r = sub, obj, act
+    
+    [policy_definition]
+    p = sub_rule, obj, act
+    
+    [policy_effect]
+    e = some(where (p.eft == allow))
+    
+    [matchers]
+    m = eval(p.sub_rule) && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)
+policies:
+    - service: trade-service
+      rule: r.sub.is_superuser == True
+      resource: /trades/{TradeId}
+      methods: DELETE
+    - service: trade-service
+      resource: /some_url
+      methods: (GET)|(POST)
+    - service: chat-service
+      resource: /chatroom
+      methods: POST
+    - service: user-service
+      resource: /auth/*
+      methods: POST
+      white_list: true
+    - service: user-service
+      resource: /users/*
+      methods: GET
+      rule: r.sub.is_superuser == False
+    - service: user-service
+      resource: /users/*
+      methods: (GET)|(POST)|(PATCH)|(DELETE)
+      rule: r.sub.is_superuser == True

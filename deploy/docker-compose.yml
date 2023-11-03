@@ -1,4 +1,11 @@
 version: "3.0"
+volumes:
+  policy-enforcement-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./policy-enforcement-service
 services:
   Tradedb:
     container_name: "Tradedb"
@@ -65,13 +72,29 @@ services:
       context: ../Services/UserService
       dockerfile: ./Dockerfile
     environment:
-      - POSTGRES_DSN=postgresql+asyncpg://userdb:userdb@Userdb:5432/userdb
+      POSTGRES_DSN: ${POSTGRES_DSN_ASYNC}
+      JWT_SECRET: ${JWT_SECRET}
+      RESET_PASSWORD_TOKEN_SECRET: ${RESET_PASSWORD_TOKEN_SECRET}
+      VERIFICATION_TOKEN_SECRET: ${VERIFICATION_TOKEN_SECRET}
     ports:
       - "5002:5002"
     networks:
       - custom
     depends_on:
       - Userdb
+  policy-enforcement-service:
+    build:
+      context: ../Services/PolicyService
+      dockerfile: ./Dockerfile
+    volumes:
+      - policy-enforcement-data:/mnt/
+    ports:
+    - "5003:5003"
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      POLICIES_CONFIG_PATH: ${POLICIES_CONFIG_PATH}
+    networks:
+      - custom
 networks:
   custom:
     driver: bridge

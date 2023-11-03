@@ -12,7 +12,7 @@ bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
 
 class CustomJWTStrategy(JWTStrategy):
     async def write_token(self, user: Any) -> Coroutine[Any, Any, str]:
-        data = {"sub": str(user.id), "aud": self.token_audience, "email": user.email,"username": user.username}
+        data = {"sub": str(user.id), "aud": self.token_audience, "is_superuser": user.is_superuser}
         return generate_jwt(
             data, self.encode_key, self.lifetime_seconds, algorithm=self.algorithm
         )
