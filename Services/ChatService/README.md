@@ -25,9 +25,10 @@ docker-compose -f deploy/docker-compose.yaml stop
      
 
 # Конфигурация
-| Переменная    | Назначение                      | Значение по-умолчанию                        |
-| -----------   | -----                           | ---                                          |
-| POSTGRES_DSN  | Строка подключения к PostgreSQL | postgresql://user:pass@localhost:5432/foobar |
+| Переменная    | Назначение                      | Значение по-умолчанию                                |
+| -----------   | -----                           | ---                                                  |
+| POSTGRES_DSN  | Строка подключения к PostgreSQL | postgresql+asyncpg://user:pass@localhost:5432/foobar |
+
 
 # Документация
 
