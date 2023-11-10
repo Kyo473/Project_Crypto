@@ -12,7 +12,7 @@
 </div>
 <script>
     let ws = null;
-
+    var endpoint = "{{ hostportDns }}";
     function appendMessage(msg) {
         let messages = document.getElementById('messages');
         let message = document.createElement('li');
@@ -34,7 +34,7 @@
         return;
     }
 
-    ws = new WebSocket(`ws://localhost:5001/ws/${roomId}/${clientId || Date.now()}`);
+    ws = new WebSocket(`ws://${endpoint}/ws/${roomId}/${clientId}`);
     ws.onopen = function () {
         appendMessage("Connected to the session.");
         getLastMessages(roomId); // Передайте ID комнаты
@@ -68,7 +68,7 @@
 
     async function getLastMessages(roomId) { 
     if (ws && ws.readyState === WebSocket.OPEN) {
-        const url = `http://localhost:5001/last_messages/${roomId}`; 
+        const url = `http://${endpoint}/last_messages/${roomId}`; 
         const response = await fetch(url, {
             method: 'GET'
         });

@@ -17,6 +17,7 @@ logging.basicConfig(
     level=2,
     format="%(levelname)-9s %(message)s"
 )
+
 templates = Jinja2Templates(directory="app/templates")
 app_config: config.Config = config.load_config()
 app = FastAPI()
@@ -27,6 +28,7 @@ app.add_middleware(
     allow_methods=["*"],  # Разрешите все HTTP-методы
     allow_headers=["*"],  # Разрешите все заголовки
 )
+
 room_managers = {}
 class ConnectionManager:
     def __init__(self):
@@ -93,7 +95,7 @@ async def websocket_endpoint(websocket: WebSocket, RoomID: uuid.UUID, client_id:
 
 @app.get("/chat",tags=["ChatRoom"])
 def get_chat_page(request: Request):
-    return templates.TemplateResponse("chat.html", {"request": request})
+    return templates.TemplateResponse("chat.html", {"request": request, "hostportDns": app_config.hostportDns})
 
 @app.post("/message", status_code=201, tags=["ChatRoom"], response_model=MessagesCreate, summary='Добавляет сообщение в базу')
 async def create_message(message: MessagesCreate, session: AsyncSession  = Depends(get_async_session)) -> MessagesRead:
