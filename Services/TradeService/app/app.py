@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse, RedirectResponse,HTMLResponse
 from sqlalchemy.orm import Session
 from .database import DB_INITIALIZER
-from .schemas import TradeBase,Trade,TradeCreate,TradeDelete,TradeUpdate
+from .schemas import TradeBase,Trade,TradeCreate,TradeDelete,TradeUpdate,TradeUpdateAdmin,TradeRead,TradeAccept
 from . import crud
 from . import config
 import typing
@@ -34,31 +34,45 @@ async def create_trade(trade: TradeCreate, db: Session = Depends(get_db)) -> Tra
     return crud.create_trade(db=db, trade=trade)
 
 @app.get("/trades",summary='Возвращает список сделок',response_model=list[Trade])
-async def get_all_trades(db: Session = Depends(get_db),skip: int = 0,limit: int = 100) -> typing.List[Trade] :
+async def get_all_trades(db: Session = Depends(get_db),skip: int = 0,limit: int = 100) -> typing.List[TradeRead] :
     return crud.get_all_trades(db, skip, limit)
 
 @app.get("/trades/{TradeId}", summary='Возвращает информацию о сделке')
-async def get_trades_info(TradeId: uuid.UUID, db: Session = Depends(get_db)) -> Trade :
+async def get_trades_info(TradeId: uuid.UUID, db: Session = Depends(get_db)) -> TradeRead :
     trade = crud.get_trade(TradeId,db)
     if trade != None:
         return trade
     return JSONResponse(status_code=404, content={"message": "Item not found"})
 
-@app.put("/trades/{TradeId}", summary='Обновляет информацию о сделке')
-async def update_trade(TradeId: uuid.UUID, trade: TradeUpdate,db: Session = Depends(get_db)) -> TradeUpdate :
+@app.patch("/trades/{TradeId}", summary='Обновляет информацию о сделке')
+async def update_trade(TradeId: uuid.UUID, trade: TradeUpdate,db: Session = Depends(get_db)) -> TradeRead :
 
     trade = crud.update_trade(TradeId, trade, db)
     if trade != None:
         return trade
     return JSONResponse(status_code=404, content={"message": "Item not found"})
 
+@app.patch("/trades/{TradeId}/accept", summary='Принять сделку')
+async def accept_trade(TradeId: uuid.UUID, trade: TradeAccept,db: Session = Depends(get_db)) -> TradeRead :
+
+    trade = crud.accept_trade(TradeId, trade, db)
+    if trade != None:
+        return trade
+    return JSONResponse(status_code=404, content={"message": "Item not found"})
+@app.put("/trades/{TradeId}", summary='Обновляет информацию сделки для админа')
+async def update_trade_admin(TradeId: uuid.UUID, trade: TradeUpdateAdmin,db: Session = Depends(get_db)) -> TradeUpdateAdmin :
+
+    trade = crud.update_trade_admin(TradeId, trade, db)
+    if trade != None:
+        return trade
+    return JSONResponse(status_code=404, content={"message": "Item not found"})
 @app.delete("/trades/{TradeId}", summary='Удаляет сделку из базы')
 async def delete_trade(TradeId: uuid.UUID, db: Session = Depends(get_db)) -> TradeDelete :
     if crud.delete_trade(TradeId, db):
         return JSONResponse(status_code=200, content={"message": "Item successfully deleted"})
     return JSONResponse(status_code=404, content={"message": "Item not found"})
 
-@app.get("/point_in_range/",tags=["Geo func"], summary='Возвращает информацию о сдлках в радиусе')
+@app.get("/point_in_range",tags=["Geo func"], summary='Возвращает информацию о сдлках в радиусе')
 async def get_spots_radius(lat: float, lon: float,radius: float,db:Session = Depends(get_db)):
     points = crud.point_in_range(lat=lat,lon=lon,radius=radius,db=db)
 

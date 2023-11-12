@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, UUID4
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+import uuid
 
 class Currency(str,Enum):
     Bitcoin = "BTC"
@@ -16,34 +17,57 @@ class Status(str,Enum):
     
 
 class TradeBase(BaseModel):
-    #buyer_id: int = Field(title='Идентификатор покупателя')
-    #seller_id: int = Field(title='Идентификатор продавца')
-    #buyer_address: str = Field(title='Адрес покупателя',default='')
-    #seller_address: str = Field(title='Адрес продавца')
     price: int = Field(title='Цена')
-    currency: Currency = Field(title='Валюта')
-    description: Optional[str] = ''
+    currency: Currency
     created_at: datetime = Field(title='Дата создания', default=datetime.utcnow())
-    lat: float
-    lon: float
-    hide: Status = Field(title='Скрыто', default='Create')
+    
 
 class Trade(TradeBase):
-    id: UUID4 = Field(title='Идентификатор сделки', default=None)
+    id: UUID4
 
+class TradeRead(TradeBase):
+    id: UUID4
+    buyer_address: str
+    seller_address: str   
+    price: int
+    currency: Currency
+    description: str
+    lat: float
+    lon: float
+    
 class TradeCreate(TradeBase):
+    seller_id: uuid.UUID
     price: int
     currency: Currency
     description: str
     lat: float
     lon: float
 
+class TradeAccept(TradeBase):
+    buyer_id: uuid.UUID
+    buyer_address :str
+    currency: Currency
+    hide : Status = "Pending"
+   
 class TradeUpdate(TradeBase):
+    buyer_address :str
     price: int
     currency: Currency
     description: str
     lat: float
     lon: float
+
+class TradeUpdateAdmin(TradeBase):
+    buyer_id: uuid.UUID
+    seller_id: uuid.UUID
+    buyer_address: str 
+    seller_address: str 
+    price: int
+    currency: Currency
+    description: str
+    lat: float
+    lon: float
+    hide : Status
 
 class TradeDelete(TradeBase):
     ...

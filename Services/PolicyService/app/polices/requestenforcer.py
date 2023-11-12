@@ -1,20 +1,14 @@
 import re
 import tempfile
-import logging
+
 import casbin
 import jwt
 import yaml
 from fastapi import Request
-from fastapi.responses import JSONResponse
 from pydantic.dataclasses import dataclass
 
 from app.polices.policeconfig import PoliciesConfig, Policy, Service
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(levelname)-9s %(message)s"
-)
 
 @dataclass
 class EnforceResult:
@@ -33,11 +27,8 @@ class RequestEnforcer:
         if in_whitelist:
             service = self.__get_service_by_name(service_name)
             return EnforceResult(True, service.entrypoint.unicode_string())
-        try:
-            access_allowed, service_name = self.__check_by_policy(request)
-        except RuntimeError as e:
-            logging.error("Произошла ошибка во время проверки политики: %s", str(e))
-            return EnforceResult(content={'message': 'Content not found'}, status_code=404)
+
+        access_allowed, service_name = self.__check_by_policy(request)
         if access_allowed:
             service = self.__get_service_by_name(service_name)
             return EnforceResult(True, service.entrypoint.unicode_string())

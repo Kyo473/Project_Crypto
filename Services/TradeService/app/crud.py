@@ -2,7 +2,7 @@ import typing
 import uuid
 from sqlalchemy.orm import Session
 from .models import trades
-from .schemas import Trade,TradeCreate,TradeDelete,TradeUpdate
+from .schemas import Trade,TradeCreate,TradeDelete,TradeUpdate,TradeUpdateAdmin,TradeRead,TradeAccept
 from shapely.geometry import Point
 from geoalchemy2 import functions as geofunc
 from geoalchemy2 import WKTElement
@@ -17,6 +17,7 @@ def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
     geo_point = WKTElement(shapely_point.wkt, srid=4326)
     db_trade = trades(
         id = uuid.uuid4(),
+        seller_id = trade.seller_id,
         price = trade.price,
         currency = trade.currency,
         description = trade.description,
@@ -31,19 +32,40 @@ def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
     db.refresh(db_trade)
     return db_trade
 
-def get_all_trades(db: Session, skip: int = 0, limit: int = 100) -> typing.List[trades]:
+def get_all_trades(db: Session,trade: TradeRead, skip: int = 0, limit: int = 100) -> typing.List[TradeRead]:
     '''
     Возвращает инфомрмацию о всех сделках 
     '''
     return db.query(trades).all()
 
-def get_trade(TradeId: uuid.UUID, db: Session) -> Trade:
+def get_trade(TradeId: uuid.UUID, db: Session) -> TradeRead:
     '''
     Возвращает инфомрмацию о сделке
     ''' 
     return db.query(trades).filter(trades.id == TradeId).first()
 
 def update_trade( TradeId: uuid.UUID, trade: TradeUpdate ,db: Session) -> TradeUpdate:
+    '''
+    Обновляет информацию о сделке
+    '''
+    result =    db.query(trades).filter(trades.id == TradeId).update(trade.dict())
+    db.commit()
+
+    if result == 1:
+        return get_trade(TradeId, db)
+    return None
+
+def accept_trade( TradeId: uuid.UUID, trade: TradeAccept ,db: Session) -> TradeRead:
+    '''
+    Обновляет информацию о сделке
+    '''
+    result =    db.query(trades).filter(trades.id == TradeId).update(trade.dict())
+    db.commit()
+
+    if result == 1:
+        return get_trade(TradeId, db)
+    return None
+def update_trade_admin( TradeId: uuid.UUID, trade: TradeUpdateAdmin ,db: Session) -> TradeUpdateAdmin:
     '''
     Обновляет информацию о сделке
     '''
@@ -90,7 +112,7 @@ def find_nearest(lat: float, lon: float,db:Session):
         .first()
     
     shapely_point = to_shape(nearest.geo_tag)
-    result = {"id_trade":nearest.id, "latitude": shapely_point.lon, "longitude": shapely_point.lat}
+    result = {"id_trade":nearest.id, "latitude": shapely_point.x, "longitude": shapely_point.y}
     return result
 
 def create_map(db:Session):

@@ -8,10 +8,10 @@ class trades(Base):
     __tablename__ = "trades"
 
     id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    buyer_id = Column(Integer)
-    seller_id = Column(Integer)
+    buyer_id = Column(UUID) 
+    seller_id = Column(UUID) 
     buyer_address = Column(String, default='')
-    seller_address = Column(String)
+    seller_address = Column(String,default='')
     price = Column(Integer, nullable=False)
     currency = Column(String, nullable=False)
     description = Column(String, default='')
@@ -19,5 +19,5 @@ class trades(Base):
     lat = Column(Float)
     lon = Column(Float)
     geo_tag = Column(Geometry('POINT', srid=4326))
-    hide = Column(String, default='Open')
+    hide = Column(String, default='Create')
     
