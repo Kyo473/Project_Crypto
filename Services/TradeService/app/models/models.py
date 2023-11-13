@@ -12,7 +12,7 @@ class trades(Base):
     seller_id = Column(UUID) 
     buyer_address = Column(String, default='')
     seller_address = Column(String,default='')
-    price = Column(Integer, nullable=False)
+    price = Column(Float, nullable=False)
     currency = Column(String, nullable=False)
     description = Column(String, default='')
     created_at = Column(TIMESTAMP, default=datetime.utcnow)

@@ -29,11 +29,11 @@ def get_db():
         db.close()
 
 
-@app.post("/trade", status_code=201, response_model=Trade,summary='Добавляет сделку в базу')
-async def create_trade(trade: TradeCreate, db: Session = Depends(get_db)) -> Trade :
+@app.post("/trade", status_code=201, response_model=TradeRead,summary='Добавляет сделку в базу')
+async def create_trade(trade: TradeCreate, db: Session = Depends(get_db)) -> TradeCreate :
     return crud.create_trade(db=db, trade=trade)
 
-@app.get("/trades",summary='Возвращает список сделок',response_model=list[Trade])
+@app.get("/trades",summary='Возвращает список сделок',response_model=list[TradeRead])
 async def get_all_trades(db: Session = Depends(get_db),skip: int = 0,limit: int = 100) -> typing.List[TradeRead] :
     return crud.get_all_trades(db, skip, limit)
 

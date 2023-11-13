@@ -9,6 +9,7 @@ from app.users import database
 class User(SQLAlchemyBaseUserTableUUID, database.BASE):
     email =  Column(String, nullable=False)
     username = Column(String, nullable=False)
+    address =  Column(String, default  = '')
     hashed_password = Column(String, nullable=False)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)
     is_active = Column(Boolean, default=True, nullable=False)

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, UUID4
+from pydantic import BaseModel, UUID4
 from datetime import datetime
 from enum import Enum
 from typing import Optional
@@ -17,52 +17,54 @@ class Status(str,Enum):
     
 
 class TradeBase(BaseModel):
-    price: int = Field(title='Цена')
-    currency: Currency
-    created_at: datetime = Field(title='Дата создания', default=datetime.utcnow())
+    class Config:
+        from_attributes = True
     
 
 class Trade(TradeBase):
     id: UUID4
 
 class TradeRead(TradeBase):
-    id: UUID4
+    id: uuid.UUID
     buyer_address: str
     seller_address: str   
-    price: int
+    price: float
+    currency: Currency
+    created_at: datetime
+    description: str
+    lat: float
+    lon: float
+    hide: Status
+    
+class TradeCreate(TradeBase):
+    seller_id: uuid.UUID
+    seller_address: str   
+    price: float
+    currency: Currency
+    description: str
+    lat: float
+    lon: float
+    hide: Status
+
+class TradeAccept(TradeBase):
+    buyer_id: uuid.UUID
+    buyer_address :str
+    hide : Status = "Pending"
+   
+class TradeUpdate(TradeBase):
+    buyer_address :str
+    price: float
     currency: Currency
     description: str
     lat: float
     lon: float
     
-class TradeCreate(TradeBase):
-    seller_id: uuid.UUID
-    price: int
-    currency: Currency
-    description: str
-    lat: float
-    lon: float
-
-class TradeAccept(TradeBase):
-    buyer_id: uuid.UUID
-    buyer_address :str
-    currency: Currency
-    hide : Status = "Pending"
-   
-class TradeUpdate(TradeBase):
-    buyer_address :str
-    price: int
-    currency: Currency
-    description: str
-    lat: float
-    lon: float
-
 class TradeUpdateAdmin(TradeBase):
     buyer_id: uuid.UUID
     seller_id: uuid.UUID
     buyer_address: str 
     seller_address: str 
-    price: int
+    price: float
     currency: Currency
     description: str
     lat: float
@@ -70,4 +72,14 @@ class TradeUpdateAdmin(TradeBase):
     hide : Status
 
 class TradeDelete(TradeBase):
-    ...
+    buyer_id: uuid.UUID
+    seller_id: uuid.UUID
+    buyer_address: str 
+    seller_address: str 
+    price: float
+    currency: Currency
+    created_at: datetime
+    description: str
+    lat: float
+    lon: float
+    hide : Status

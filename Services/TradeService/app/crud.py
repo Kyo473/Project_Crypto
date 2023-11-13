@@ -8,7 +8,7 @@ from geoalchemy2 import functions as geofunc
 from geoalchemy2 import WKTElement
 import folium
 from geoalchemy2.shape import to_shape
-
+from datetime import datetime 
 def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
     '''
     Создает новое объявление сделки в БД
@@ -17,9 +17,11 @@ def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
     geo_point = WKTElement(shapely_point.wkt, srid=4326)
     db_trade = trades(
         id = uuid.uuid4(),
-        seller_id = trade.seller_id,
+        seller_id = trade.seller_id,\
+        seller_address = trade.seller_address,
         price = trade.price,
         currency = trade.currency,
+        created_at = datetime.utcnow(),
         description = trade.description,
         hide  = trade.hide,
         lat = trade.lat,
