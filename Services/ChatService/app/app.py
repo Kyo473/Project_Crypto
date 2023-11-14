@@ -97,17 +97,6 @@ async def websocket_endpoint(websocket: WebSocket, RoomID: uuid.UUID, client_id:
 def get_chat_page(request: Request):
     return templates.TemplateResponse("chat.html", {"request": request, "hostportDns": app_config.hostportDns})
 
-@app.post("/message", status_code=201, tags=["ChatRoom"], response_model=MessagesCreate, summary='Добавляет сообщение в базу')
-async def create_message(message: MessagesCreate, session: AsyncSession  = Depends(get_async_session)) -> MessagesRead:
-    return await crud.create_message(session=session, message=message)
-   
-
-@app.get("/message/{MessageID}",tags=["ChatRoom"], summary='Возвращает сообщение')
-async def get_message(MessageID: uuid.UUID, session: AsyncSession  = Depends(get_async_session)) -> MessagesRead :
-    message = crud.get_message(MessageID,session)
-    if message != None:
-        return message
-    return await JSONResponse(status_code=404, content={"message": "Item not found"})
 
 @app.post("/chatroom",tags=["ChatRoom"], status_code=201, response_model=ChatRead,summary='Создает чат')
 async def create_chat(chat: ChatCreate, session: AsyncSession  = Depends(get_async_session)) -> ChatRead :

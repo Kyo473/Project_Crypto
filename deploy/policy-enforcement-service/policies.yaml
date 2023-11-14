@@ -47,12 +47,17 @@ policies:
       rule: r.sub.is_superuser == False
     - service: trade-service
       resource: /trades
-      methods: POST
+      methods: GET
       rule: r.sub.is_superuser == True
     - service: trade-service
       resource: /trades/*
-      methods: (GET)|(PUT)|(DELETE)
+      methods: (GET)|(PATCH)
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /trades/*
+      methods: (GET)|(PUT)|(DELETE)|(PATCH)
       rule: r.sub.is_superuser == True
+    
     - service: trade-service
       resource: /point_in_range
       methods: GET
@@ -61,14 +66,16 @@ policies:
       resource: /point_in_range
       methods: GET
       rule: r.sub.is_superuser == True 
+    
     - service: trade-service
       resource: /nearest
-      methods: GET
+      methods: GET      
       rule: r.sub.is_superuser == False
     - service: trade-service
       resource: /nearest
       methods: GET
       rule: r.sub.is_superuser == True
+    
     - service: trade-service
       resource: /visualize
       methods: GET
