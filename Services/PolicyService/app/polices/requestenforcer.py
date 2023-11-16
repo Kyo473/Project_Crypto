@@ -4,6 +4,7 @@ import logging
 import casbin
 import jwt
 import yaml
+import json
 from fastapi import Request,WebSocket
 from pydantic.dataclasses import dataclass
 
@@ -27,28 +28,40 @@ class WebsocketEnforcer:
         self.enforcer: casbin.Enforcer = self.__create_enforcer()
 
     async def enforce_websocket(self, websocket: WebSocket, path_name: str) -> EnforceResult:
-        token_data = self.__extract_token_data(websocket)
-        if token_data is None:
-            print("Token data is None")
+        
+        token_message = await websocket.receive_text()
+        if not token_message:
+            logger.info("No token received")
+            await websocket.close()
+            return EnforceResult()
+
+        token = None
+        try:
+            token = json.loads(token_message).get('authorization').split(' ')[1]
+        except Exception as e:
+            await websocket.close()
+            return EnforceResult()
+
+        token_data = jwt.decode(token, self.jwt_secret, algorithms=["HS256"], audience=["fastapi-users:auth"])
+        if not token_data:
+            await websocket.close()
             return EnforceResult()
 
         resource = '/ws/' + path_name
-    
-        logger.info(f"Enforcing websocket for resource: {resource}")
-
-        access_allowed = self.enforcer.enforce(token_data, resource, 'WEBSOCKET')
-        logger.info(f"Access allowed: {access_allowed}")
+        access_allowed = self.__check_access(token_data, resource)
 
         if not access_allowed:
+            await websocket.close()
             return EnforceResult()
 
-        for p in self.enforcing_policies:
-            if re.match(p.resource, resource) and 'WEBSOCKET' in p.methods:
-                print(f"Matched policy for resource: {p.resource}")
-                return EnforceResult(True, p.service)
+        matching_policy = self.__find_matching_policy(resource)
+        if matching_policy:
+            return EnforceResult(True, matching_policy.service)
 
+        await websocket.close()
         return EnforceResult()
-    
+
+
     def __load_config(self, config_path: str) -> PoliciesConfig:
         with open(config_path) as file:
             data = yaml.safe_load(file)
@@ -69,15 +82,25 @@ class WebsocketEnforcer:
     def __make_policy_temp_file(self) -> str:
         tmp = tempfile.NamedTemporaryFile(delete=False)
         with open(tmp.name, 'w') as f:
-            f.writelines(
-                list(f'p, {p.rule}, {p.resource}, {p.methods}\n' for p in self.config.policies if not p.white_list)
-            )
+            for p in self.config.policies:
+                if not p.white_list:
+                    f.write(f"p, {p.rule}, {p.resource}, {p.methods}\n")
         return tmp.name
+
 
     def __extract_token_data(self, websocket: WebSocket) -> dict:
         if 'authorization' in websocket.headers:
             token = websocket.headers['authorization'].split(' ')[1]
             return jwt.decode(token, self.jwt_secret, algorithms=["HS256"], audience=["fastapi-users:auth"])
+        return None
+
+    def __check_access(self, token_data: dict, resource: str) -> bool:
+        return self.enforcer.enforce(token_data, resource, 'WEBSOCKET')
+
+    def __find_matching_policy(self, resource: str) -> Policy:
+        for p in self.enforcing_policies:
+            if re.match(p.resource, resource) and 'WEBSOCKET' in p.methods:
+                return p
         return None
     
     @property

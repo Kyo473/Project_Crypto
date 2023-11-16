@@ -12,13 +12,13 @@ model: |
     r = sub, obj, act
     
     [policy_definition]
-    p = sub_rule, obj, act
+    p = sub, obj, act
     
     [policy_effect]
     e = some(where (p.eft == allow))
     
     [matchers]
-    m = eval(p.sub_rule) && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)
+    m = eval(p.sub) && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)
 policies:
     - service: user-service
       resource: /auth/*
@@ -116,7 +116,9 @@ policies:
       resource: /ws/*
       methods: WEBSOCKET
       rule: r.sub.is_superuser == False
+      
     - service: chat-service
       resource: /ws/*
       methods: WEBSOCKET
       rule: r.sub.is_superuser == True
+      

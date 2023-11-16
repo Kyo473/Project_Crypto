@@ -21,7 +21,7 @@ class Policy(BaseModel):
 
     @property
     def method_list(self) -> list[str]:
-        available_methods = ["GET", "DELETE", "PATCH", "POST", "PUT", "HEAD", "OPTIONS", "CONNECT", "TRACE"]
+        available_methods = ["GET", "DELETE", "PATCH", "POST", "PUT", "HEAD", "OPTIONS", "CONNECT", "TRACE","WEBSOCKET"]
         return [m for m in available_methods if m in self.methods]
 
 

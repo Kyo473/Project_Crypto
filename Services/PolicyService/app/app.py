@@ -58,7 +58,10 @@ async def reverse(websocket: WebSocket, client: websockets.WebSocketClientProtoc
 async def websocket_endpoint(websocket: WebSocket, path_name: str):
     await websocket.accept()
 
+    
     enforce_result: EnforceResult = await websocket_enforcer.enforce_websocket(websocket, path_name)
+    logger.info(f"Enforcement result for {path_name}: Access Allowed - {enforce_result.access_allowed}")
+
     if not enforce_result.access_allowed:
         logger.info('The user does not have enough permissions. A blocked route: %s', path_name)
         await websocket.close()
