@@ -1,4 +1,4 @@
-from pydantic import BaseModel, UUID4
+from pydantic import BaseModel
 from datetime import datetime
 import uuid
 
@@ -6,11 +6,12 @@ class ChatBase(BaseModel):
     pass
 
 class ChatCreate(ChatBase):
+    id: uuid.UUID
     seller_id: uuid.UUID
     buyer_id: uuid.UUID
 
 class ChatRead(ChatBase):
-    id: UUID4
+    id: uuid.UUID
     seller_id: uuid.UUID
     buyer_id: uuid.UUID
 
@@ -27,7 +28,7 @@ class MessagesCreate(MessagesBase):
         from_attributes = True
 
 class MessagesRead(MessagesBase):
-    id: UUID4
+    id: uuid.UUID
     class Config:
         from_attributes = True
     

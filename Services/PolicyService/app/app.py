@@ -7,7 +7,7 @@ from fastapi import FastAPI, Request, WebSocket
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app import config, schemes
-from app.polices.requestenforcer import EnforceResult, RequestEnforcer
+from app.polices.requestenforcer import EnforceResult, RequestEnforcer,WebsocketEnforcer
 
 # setup logging
 logger = logging.getLogger(__name__)
@@ -21,7 +21,9 @@ app_config: config.Config = config.load_config()
 policy_checker: RequestEnforcer = RequestEnforcer(
     app_config.policies_config_path, app_config.jwt_secret.get_secret_value()
 )
-
+websocket_enforcer: WebsocketEnforcer = WebsocketEnforcer(
+    app_config.policies_config_path, app_config.jwt_secret.get_secret_value()
+)
 class App(FastAPI):
     def openapi(self) -> Dict[str, Any]:
         scheme_builder = schemes.SchemeBuilder(super().openapi())
@@ -33,6 +35,7 @@ class App(FastAPI):
 
 
 app = App()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], # Allows all origins
@@ -41,41 +44,26 @@ app.add_middleware(
     allow_headers=["*"], # Allows all headers
 )
 async def forward(websocket: WebSocket, client: websockets.WebSocketClientProtocol):
-    while True:
-        data = await websocket.receive()
+    async for data in websocket.iter_text():
         logger.info("Websocket received: %s", data)
-        await client.send(data['text'])
+        await client.send(data)
 
 
 async def reverse(websocket: WebSocket, client: websockets.WebSocketClientProtocol):
-    while True:
-        data = await client.recv()
+    async for data in client:
         logger.info("Websocket sent: %s", data)
-        await websocket.send_bytes(data)
+        await websocket.send_text(data)
 
 @app.websocket("/ws/{path_name:path}")
 async def websocket_endpoint(websocket: WebSocket, path_name: str):
-    enforce_result = policy_checker.enforce_websocket(websocket, path_name)
+    await websocket.accept()
 
+    enforce_result: EnforceResult = await websocket_enforcer.enforce_websocket(websocket, path_name)
     if not enforce_result.access_allowed:
+        logger.info('The user does not have enough permissions. A blocked route: %s', path_name)
         await websocket.close()
         return
 
-    await websocket.accept()
-    async with websockets.connect(f'ws://chat-service:5001/ws/{path_name}') as client:
-        fwd_task = asyncio.create_task(forward(websocket, client))
-        rev_task = asyncio.create_task(reverse(websocket, client))
-        await asyncio.gather(fwd_task, rev_task)
-
-@app.websocket("/proxy/{path_name:path}")
-async def websocket_proxy(websocket: WebSocket, path_name: str):
-    enforce_result = policy_checker.enforce_websocket(websocket, path_name)
-
-    if not enforce_result.access_allowed:
-        await websocket.close()
-        return
-
-    await websocket.accept()
     async with websockets.connect(f'ws://chat-service:5001/ws/{path_name}') as client:
         fwd_task = asyncio.create_task(forward(websocket, client))
         rev_task = asyncio.create_task(reverse(websocket, client))

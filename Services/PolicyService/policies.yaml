@@ -20,25 +20,103 @@ model: |
     [matchers]
     m = eval(p.sub_rule) && keyMatch(r.obj, p.obj) && regexMatch(r.act, p.act)
 policies:
-    - service: trade-service
-      rule: r.sub.is_superuser == True
-      resource: /trades/{TradeId}
-      methods: DELETE
-    - service: trade-service
-      resource: /some_url
-      methods: (GET)|(POST)
-    - service: chat-service
-      resource: /chatroom
-      methods: POST
     - service: user-service
       resource: /auth/*
       methods: POST
       white_list: true
     - service: user-service
-      resource: /users/*
-      methods: GET
+      resource: /users/me
+      methods: (GET)|(PATCH)
       rule: r.sub.is_superuser == False
     - service: user-service
       resource: /users/*
       methods: (GET)|(POST)|(PATCH)|(DELETE)
+      rule: r.sub.is_superuser == True
+    
+    - service: trade-service
+      resource: /trade
+      methods: POST
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /trade
+      methods: POST
+      rule: r.sub.is_superuser == True
+    - service: trade-service
+      resource: /trades
+      methods: GET
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /trades
+      methods: GET
+      rule: r.sub.is_superuser == True
+    - service: trade-service
+      resource: /trades/*
+      methods: (GET)|(PATCH)
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /trades/*
+      methods: (GET)|(PUT)|(DELETE)|(PATCH)
+      rule: r.sub.is_superuser == True
+    
+    - service: trade-service
+      resource: /point_in_range
+      methods: GET
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /point_in_range
+      methods: GET
+      rule: r.sub.is_superuser == True 
+    
+    - service: trade-service
+      resource: /nearest
+      methods: GET      
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /nearest
+      methods: GET
+      rule: r.sub.is_superuser == True
+    
+    - service: trade-service
+      resource: /visualize
+      methods: GET
+      rule: r.sub.is_superuser == False
+    - service: trade-service
+      resource: /visualize
+      methods: GET
+      rule: r.sub.is_superuser == True
+
+    - service: chat-service
+      resource: /chatroom
+      methods: POST
+      rule: r.sub.is_superuser == False
+    - service: chat-service
+      resource: /chatroom
+      methods: POST
+      rule: r.sub.is_superuser == True
+    
+    - service: chat-service
+      resource: /last_messages/*
+      methods: GET
+      rule: r.sub.is_superuser == False
+    - service: chat-service
+      resource: /last_messages/*
+      methods: GET
+      rule: r.sub.is_superuser == True
+    
+    - service: chat-service
+      resource: /chat
+      methods: GET
+      rule: r.sub.is_superuser == False
+    - service: chat-service
+      resource: /chat
+      methods: GET
+      rule: r.sub.is_superuser == True
+
+    - service: chat-service
+      resource: /ws/*
+      methods: WEBSOCKET
+      rule: r.sub.is_superuser == False
+    - service: chat-service
+      resource: /ws/*
+      methods: WEBSOCKET
       rule: r.sub.is_superuser == True

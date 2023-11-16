@@ -93,6 +93,7 @@ policies:
       resource: /chatroom
       methods: POST
       rule: r.sub.is_superuser == True
+    
     - service: chat-service
       resource: /last_messages/*
       methods: GET
@@ -101,6 +102,7 @@ policies:
       resource: /last_messages/*
       methods: GET
       rule: r.sub.is_superuser == True
+    
     - service: chat-service
       resource: /chat
       methods: GET
@@ -109,4 +111,12 @@ policies:
       resource: /chat
       methods: GET
       rule: r.sub.is_superuser == True
-  
+
+    - service: chat-service
+      resource: /ws/*
+      methods: WEBSOCKET
+      rule: r.sub.is_superuser == False
+    - service: chat-service
+      resource: /ws/*
+      methods: WEBSOCKET
+      rule: r.sub.is_superuser == True

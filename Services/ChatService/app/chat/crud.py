@@ -9,7 +9,7 @@ async def create_chat(session: AsyncSession , chat: ChatCreate) -> ChatCreate:
     Создает новый чат
     '''
     db_chat = ChatRoom(
-        id = uuid.uuid4(),
+        id = chat.id,
         buyer_id = chat.buyer_id,
         seller_id = chat.seller_id,
     )

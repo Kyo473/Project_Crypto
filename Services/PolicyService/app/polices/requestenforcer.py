@@ -1,20 +1,105 @@
 import re
 import tempfile
-
+import logging
 import casbin
 import jwt
 import yaml
-from fastapi import Request
+from fastapi import Request,WebSocket
 from pydantic.dataclasses import dataclass
 
 from app.polices.policeconfig import PoliciesConfig, Policy, Service
 
-
+# setup logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)-9s %(message)s"
+)
 @dataclass
 class EnforceResult:
     access_allowed: bool = False
     redirect_service: str = None
 
+class WebsocketEnforcer:
+    def __init__(self, config_path: str, jwt_secret: str) -> None:
+        self.jwt_secret: str = jwt_secret
+        self.config: PoliciesConfig = self.__load_config(config_path=config_path)
+        self.enforcer: casbin.Enforcer = self.__create_enforcer()
+
+    async def enforce_websocket(self, websocket: WebSocket, path_name: str) -> EnforceResult:
+        token_data = self.__extract_token_data(websocket)
+        if token_data is None:
+            print("Token data is None")
+            return EnforceResult()
+
+        resource = '/ws/' + path_name
+    
+        logger.info(f"Enforcing websocket for resource: {resource}")
+
+        access_allowed = self.enforcer.enforce(token_data, resource, 'WEBSOCKET')
+        logger.info(f"Access allowed: {access_allowed}")
+
+        if not access_allowed:
+            return EnforceResult()
+
+        for p in self.enforcing_policies:
+            if re.match(p.resource, resource) and 'WEBSOCKET' in p.methods:
+                print(f"Matched policy for resource: {p.resource}")
+                return EnforceResult(True, p.service)
+
+        return EnforceResult()
+    
+    def __load_config(self, config_path: str) -> PoliciesConfig:
+        with open(config_path) as file:
+            data = yaml.safe_load(file)
+            return PoliciesConfig(**data)
+
+    def __create_enforcer(self) -> casbin.Enforcer:
+        model_conf = self.__make_model_temp_file()
+        policy_conf = self.__make_policy_temp_file()
+        return casbin.Enforcer(model_conf, policy_conf)
+
+    def __make_model_temp_file(self) -> str:
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        with open(tmp.name, 'w') as f:
+            f.write(self.config.model)
+
+        return tmp.name
+
+    def __make_policy_temp_file(self) -> str:
+        tmp = tempfile.NamedTemporaryFile(delete=False)
+        with open(tmp.name, 'w') as f:
+            f.writelines(
+                list(f'p, {p.rule}, {p.resource}, {p.methods}\n' for p in self.config.policies if not p.white_list)
+            )
+        return tmp.name
+
+    def __extract_token_data(self, websocket: WebSocket) -> dict:
+        if 'authorization' in websocket.headers:
+            token = websocket.headers['authorization'].split(' ')[1]
+            return jwt.decode(token, self.jwt_secret, algorithms=["HS256"], audience=["fastapi-users:auth"])
+        return None
+    
+    @property
+    def service_schemes(self) -> list[str]:
+        return [s.openapi_scheme for s in self.config.services]
+
+    @property
+    def services(self) -> list[Service]:
+        return [s for s in self.config.services]
+
+
+    @property
+    def whilelist_resources(self) -> list[str]:
+        return [p.resource for p in self.config.policies if p.white_list]
+    
+    @property
+    def whilelist_policies(self) -> list[Policy]:
+        return [p for p in self.config.policies if p.white_list]
+    
+    @property
+    def enforcing_policies(self) -> list[Policy]:
+        return [p for p in self.config.policies if not p.white_list]
 
 class RequestEnforcer:
     def __init__(self, config_path: str, jwt_secret: str) -> None:
@@ -33,7 +118,7 @@ class RequestEnforcer:
             service = self.__get_service_by_name(service_name)
             return EnforceResult(True, service.entrypoint.unicode_string())
         return EnforceResult()
-
+    
     def __load_config(self, config_path: str) -> PoliciesConfig:
         with open(config_path) as file:
             data = yaml.safe_load(file)
