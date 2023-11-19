@@ -51,26 +51,38 @@ async def forward(websocket: WebSocket, client: websockets.WebSocketClientProtoc
 
 async def reverse(websocket: WebSocket, client: websockets.WebSocketClientProtocol):
     async for data in client:
-        logger.info("Websocket sent: %s", data)
+        # logger.info("Websocket sent: %s", data)
         await websocket.send_text(data)
 
 @app.websocket("/ws/{path_name:path}")
 async def websocket_endpoint(websocket: WebSocket, path_name: str):
-    await websocket.accept()
+    connected = False
 
-    
-    enforce_result: EnforceResult = await websocket_enforcer.enforce_websocket(websocket, path_name)
-    logger.info(f"Enforcement result for {path_name}: Access Allowed - {enforce_result.access_allowed}")
+    try:
+        await websocket.accept()
 
-    if not enforce_result.access_allowed:
-        logger.info('The user does not have enough permissions. A blocked route: %s', path_name)
-        await websocket.close()
-        return
+        enforce_result: EnforceResult = await websocket_enforcer.enforce_websocket(websocket, path_name)
 
-    async with websockets.connect(f'ws://chat-service:5001/ws/{path_name}') as client:
-        fwd_task = asyncio.create_task(forward(websocket, client))
-        rev_task = asyncio.create_task(reverse(websocket, client))
-        await asyncio.gather(fwd_task, rev_task)
+        if not enforce_result.access_allowed:
+            logger.info('The user does not have enough permissions. A blocked route: %s', path_name)
+            return
+
+        async with websockets.connect(f'ws://chat-service:5001/ws/{path_name}') as client:
+            connected = True
+
+            fwd_task = asyncio.create_task(forward(websocket, client))
+            rev_task = asyncio.create_task(reverse(websocket, client))
+
+            await asyncio.gather(fwd_task, rev_task)
+
+    except websockets.exceptions.ConnectionClosedError:
+        logger.error('Connection with chat-service closed unexpectedly.')
+    except Exception as e:
+        logger.error('An error occurred: %s', e)
+    finally:
+        if connected:
+            await websocket.close()
+
 
 @app.api_route("/{path_name:path}", methods=["GET", "DELETE", "PATCH", "POST", "PUT", "HEAD", "OPTIONS", "CONNECT", "TRACE"])
 async def catch_all(request: Request, path_name: str):
