@@ -6,6 +6,13 @@ volumes:
       o: bind
       type: none
       device: ./policy-enforcement-service
+  e2e-test-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./e2e
+
 services:
   Tradedb:
     container_name: "Tradedb"
@@ -24,7 +31,7 @@ services:
       context: ../Services/TradeService
       dockerfile: ./Dockerfile
     environment:
-      - POSTGRES_DSN=postgresql://tradedb:tradedb@Tradedb:5432/tradedb
+      POSTGRES_DSN: postgresql://tradedb:tradedb@Tradedb:5432/tradedb
     ports:
       - "5000:5000"
     networks:
@@ -76,6 +83,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       RESET_PASSWORD_TOKEN_SECRET: ${RESET_PASSWORD_TOKEN_SECRET}
       VERIFICATION_TOKEN_SECRET: ${VERIFICATION_TOKEN_SECRET}
+      AMQP: ${AMQP}
     ports:
       - "5002:5002"
     networks:
@@ -93,6 +101,34 @@ services:
     environment:
       JWT_SECRET: ${JWT_SECRET}
       POLICIES_CONFIG_PATH: ${POLICIES_CONFIG_PATH}
+    networks:
+      - custom
+  notify-service:
+    build:
+      context: ../Services/RabbitMQ
+      dockerfile: ./DockerFile
+    environment:
+      PASS: ${PASS}
+      EMAIL : ${EMAIL}
+      AMQP: ${AMQP}
+    networks:
+      - custom
+  rabbitmq:
+    image: rabbitmq:3.12.8-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - custom
+  test-runner:
+    image: python:3.11
+    volumes:
+      - e2e-test-data:/mnt/
+    command: >
+      bash -c "pip install requests pydantic sqlalchemy psycopg2-binary
+      && python -m unittest /mnt/test.py"
+    depends_on:
+      - policy-enforcement-service
     networks:
       - custom
 networks:

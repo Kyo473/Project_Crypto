@@ -29,6 +29,11 @@ class Config(BaseSettings):
         env='VERIFICATION_TOKEN_SECRET',
         alias='VERIFICATION_TOKEN_SECRET'
     )
+    amqp: str = Field(
+        default='amqp://guest:guest@localhost/',
+        env='AMQP',
+        alias='AMQP'
+    )
 
     class Config:
         env_file = ".env"
