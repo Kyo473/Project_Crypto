@@ -33,3 +33,8 @@ docker-compose -f deploy/docker-compose.yaml stop
 # Документация
 
 После запуска доступна документация: http://localhost:5001/docs
+## Run tests
+
+```bash
+python -m unittest
+```

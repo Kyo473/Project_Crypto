@@ -128,7 +128,7 @@ services:
       - e2e-test-data:/mnt/
     command: >
       bash -c "pip install requests pydantic sqlalchemy psycopg2-binary
-      && python -m unittest /mnt/test.py"
+      && python -m unittest -v /mnt/test.py"
     depends_on:
       - policy-enforcement-service
     networks:

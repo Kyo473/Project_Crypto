@@ -38,7 +38,7 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections.append(websocket)
 
-    def disconnect(self, websocket: WebSocket):
+    async def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
@@ -90,7 +90,7 @@ async def websocket_endpoint(websocket: WebSocket, RoomID: uuid.UUID, client_id:
             data = await websocket.receive_text()
             await manager.broadcast(f"Client #{client_id} in Room {RoomID} says: {data}",RoomID,client_id,add_to_db=True)
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        await manager.disconnect(websocket)
         await manager.broadcast(f"Client #{client_id} left Room:{RoomID}",RoomID,client_id,add_to_db=False)
 
 @app.get("/chat",tags=["ChatRoom"])
