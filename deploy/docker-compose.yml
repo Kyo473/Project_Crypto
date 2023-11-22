@@ -6,14 +6,21 @@ volumes:
       o: bind
       type: none
       device: ./policy-enforcement-service
-  # e2e-test-data:
-  #   driver: local
-  #   driver_opts:
-  #     o: bind
-  #     type: none
-  #     device: ./e2e
+  e2e-test-data:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ./e2e
 
 services:
+  rabbitmq:
+    image: rabbitmq:3.12.8-management-alpine
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - custom
   Tradedb:
     container_name: "Tradedb"
     image: postgis/postgis:13-master
@@ -105,32 +112,27 @@ services:
       - custom
   notify-service:
     build:
-      context: ../Services/RabbitMQ
+      context: ../Services/NotifyService
       dockerfile: ./DockerFile
     environment:
       PASS: ${PASS}
       EMAIL : ${EMAIL}
       AMQP: ${AMQP}
+    depends_on:
+       - rabbitmq
     networks:
       - custom
-  rabbitmq:
-    image: rabbitmq:3.12.8-management-alpine
-    ports:
-      - 5672:5672
-      - 15672:15672
+  test-runner:
+    image: python:3.11
+    volumes:
+      - e2e-test-data:/mnt/
+    command: >
+      bash -c "pip install requests pydantic sqlalchemy psycopg2-binary
+      && python -m unittest /mnt/test.py"
+    depends_on:
+      - policy-enforcement-service
     networks:
       - custom
-  # test-runner:
-  #   image: python:3.11
-  #   volumes:
-  #     - e2e-test-data:/mnt/
-  #   command: >
-  #     bash -c "pip install requests pydantic sqlalchemy psycopg2-binary
-  #     && python -m unittest /mnt/test.py"
-  #   depends_on:
-  #     - policy-enforcement-service
-  #   networks:
-  #     - custom
 networks:
   custom:
     driver: bridge
