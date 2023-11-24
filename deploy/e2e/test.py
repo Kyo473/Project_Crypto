@@ -55,7 +55,7 @@ class TestBaseUtils(unittest.TestCase):
         pass
 
     def test_service_available(self):
-        response = requests.get(ENTRYPOINT)
+        response = requests.get(ENTRYPOINT,timeout=15)
         self.assertEqual(response.status_code, 404)
         data = response.json()
         self.assertIsInstance(data, dict)
@@ -86,11 +86,11 @@ class TestTradeBase(unittest.TestCase):
             "hide": "Create"
         }
         try:
-            response = requests.post(f'{TRADE_ENDPOINT}trade', json=payload)
+            response = requests.post(f'{TRADE_ENDPOINT}trade', json=payload,timeout=15)
             self.assertEqual(response.status_code, 201)
             new_trade = Trade(**response.json())
             self.test_trades.append(new_trade)  
-            logger.info("Trade Create")
+            # logger.info("Trade Create")
         except requests.exceptions.HTTPError as exc:
             logger.error(exc)
         
@@ -102,7 +102,7 @@ class TestTradeBase(unittest.TestCase):
             for trade in self.test_trades:
                 connection.execute(text(f"""DELETE FROM "trades" WHERE id = '{trade.id}';"""))
             connection.commit()
-            logger.info("Trade Delete")
+            # logger.info("Trade Delete")
     def tearDown(self) -> None:
         self._delete_trades()  
 
@@ -115,13 +115,13 @@ class TestTrade(TestTradeBase):
         return super().tearDown()
 
     def test_get_trades(self):
-        response = requests.get(f"{TRADE_ENDPOINT}trades")
+        response = requests.get(f"{TRADE_ENDPOINT}trades",timeout=15)
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIsInstance(data,list)
 
     def test_get_trade_by(self):
-        response = requests.get(f"{TRADE_ENDPOINT}trades/{self.test_trades[0].id}")  # Пример обращения к первой созданной сделке
+        response = requests.get(f"{TRADE_ENDPOINT}trades/{self.test_trades[0].id}",timeout=15)  
         self.assertEqual(response.status_code, 200)
         data = response.json()
         self.assertIsInstance(data, dict)
