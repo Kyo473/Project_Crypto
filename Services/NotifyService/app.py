@@ -44,6 +44,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# logger.info(f"Email:{cfg.email}")
+# logger.info(f"Pass:{cfg.password}")
 
 async def consume_from_queue():
     connection = await aio_pika.connect_robust(cfg.amqp_url)
@@ -63,12 +65,12 @@ async def consume_from_queue():
         msg = EmailMessage()
         msg.set_content("Вы успешно зарегистрировались на платформе")
         msg['Subject'] = 'Сообщение о успешной регистрации'
-        msg['From'] = 'project.crypto@mail.ru'
+        msg['From'] = cfg.email
         msg['To'] = email_address
 
         try:
             with smtplib.SMTP_SSL('smtp.mail.ru', 465) as smtp:
-                smtp.login('project.crypto@mail.ru', 'mmNQnhvJWXNctqNeh7ep')
+                smtp.login(f"{cfg.email}", f"{cfg.password}")
                 smtp.send_message(msg)
                 logger.info("Email успешно отправлен!")
         except Exception as e:
