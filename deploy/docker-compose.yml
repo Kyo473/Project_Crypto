@@ -33,18 +33,10 @@ services:
       - "5432:5432"
     networks:
       - custom
-  trade-service:
-    build:
-      context: ../Services/TradeService
-      dockerfile: ./Dockerfile
-    environment:
-      POSTGRES_DSN: postgresql://tradedb:tradedb@Tradedb:5432/tradedb
-    ports:
-      - "5000:5000"
-    networks:
-      - custom
-    depends_on:
-      - Tradedb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "tradedb", "-d", "tradedb", "-h", "localhost", "-p", "5432"]
+      interval: 5s
+      retries: 5
   Chatdb:
     container_name: "Chatdb"
     image: postgres:14.1-alpine
@@ -57,18 +49,10 @@ services:
       - "5433:5432"
     networks:
       - custom
-  chat-service:
-    build:
-      context: ../Services/ChatService
-      dockerfile: ./Dockerfile
-    environment:
-      - POSTGRES_DSN=postgresql+asyncpg://chatdb:chatdb@Chatdb:5432/chatdb
-    ports:
-      - "5001:5001"
-    networks:
-      - custom
-    depends_on:
-      - Chatdb
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "chatdb", "-d", "chatdb", "-h", "localhost", "-p", "5432"]
+      interval: 5s
+      retries: 5
   Userdb:
     container_name: "userdb"
     image: postgres:14.1-alpine
@@ -81,6 +65,36 @@ services:
       - "5434:5432"
     networks:
       - custom
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "userdb", "-d", "userdb", "-h", "localhost", "-p", "5432"]
+      interval: 5s
+      retries: 5
+  trade-service:
+    build:
+      context: ../Services/TradeService
+      dockerfile: ./Dockerfile
+    environment:
+      POSTGRES_DSN: postgresql://tradedb:tradedb@Tradedb:5432/tradedb
+    ports:
+      - "5000:5000"
+    networks:
+      - custom
+    depends_on:
+      Tradedb:
+        condition: service_healthy
+  chat-service:
+    build:
+      context: ../Services/ChatService
+      dockerfile: ./Dockerfile
+    environment:
+      - POSTGRES_DSN=postgresql+asyncpg://chatdb:chatdb@Chatdb:5432/chatdb
+    ports:
+      - "5001:5001"
+    networks:
+      - custom
+    depends_on:
+      Chatdb:
+        condition: service_healthy
   user-service:
     build:
       context: ../Services/UserService
@@ -96,7 +110,8 @@ services:
     networks:
       - custom
     depends_on:
-      - Userdb
+      Userdb:
+        condition: service_healthy
   policy-enforcement-service:
     build:
       context: ../Services/PolicyService
