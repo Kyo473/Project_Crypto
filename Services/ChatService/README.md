@@ -4,6 +4,9 @@
 Проект использует PostgreSQL в качестве базы данных.
 
 ## Запуск проекта
+### Зависимости
+
+Перед запуском сервиса необходимо установить зависимости из файла requirements.txt
 ### Для запуска проекта из директории выполните следующие команды:
 
 ```bash
@@ -15,8 +18,6 @@ docker-compose -f deploy/docker-compose.yaml up -d
 docker-compose -f deploy/docker-compose.yaml stop
 ```
 ## API Управления чатами :
-     - `POST` **/message** - создание нового сообщения в БД 
-     - `GET` **/message/{MessageID}**  - получение сообщения из БД
      - `POST` **/chatroom** - создание нового чата 
      - `GET` **/chatroom/{RoomID}**  - Возвращает информацию о чате
      - `GET` **/chat**  - Открывает html с чатом пользователей
@@ -33,6 +34,7 @@ docker-compose -f deploy/docker-compose.yaml stop
 # Документация
 
 После запуска доступна документация: http://localhost:5001/docs
+
 ## Run tests
 
 ```bash

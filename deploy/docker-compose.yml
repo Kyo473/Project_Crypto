@@ -147,6 +147,7 @@ services:
       && python -m unittest -v /mnt/test.py"
     depends_on:
       - policy-enforcement-service
+      - trade-service
     networks:
       - custom
 networks:
