@@ -91,7 +91,7 @@ async def websocket_endpoint(websocket: WebSocket, RoomID: uuid.UUID, client_id:
             await manager.broadcast(f"Client #{client_id} in Room {RoomID} says: {data}",RoomID,client_id,add_to_db=True)
     except WebSocketDisconnect:
         await manager.disconnect(websocket)
-        await manager.broadcast(f"Client #{client_id} left Room:{RoomID}",RoomID,client_id,add_to_db=False)
+        
 
 @app.get("/chat",tags=["ChatRoom"])
 def get_chat_page(request: Request):

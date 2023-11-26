@@ -150,6 +150,14 @@ services:
       - trade-service
     networks:
       - custom
+  react-app:
+    build:
+      context: ../my-app
+      dockerfile: ./Dockerfile 
+    ports:
+      - "3000:3000" 
+    networks:
+      - custom
 networks:
   custom:
     driver: bridge
