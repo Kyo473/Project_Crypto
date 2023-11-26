@@ -9,13 +9,23 @@ import re
 class Config(BaseSettings):
     email: str = Field(
         default='',
-        env='EMAIL',
-        alias='EMAIL'
+        env='SMTP_EMAIL',
+        alias='SMTP_EMAIL'
     )
     password: str = Field(
         default='',
-        env='PASS',
-        alias='PASS'
+        env='SMTP_PASS',
+        alias='SMTP_PASS'
+    )
+    smtp_url: str = Field(
+        default='smtp.mail.ru',
+        env='SMTP_URL',
+        alias='SMTP_URL'
+    )
+    smtp_port:str = Field(
+        default='465',
+        env='SMTP_PORT',
+        alias='SMTP_PORT'
     )
     amqp_url: str = Field(
         default='amqp://guest:guest@localhost/',
@@ -44,9 +54,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# logger.info(f"Email:{cfg.email}")
-# logger.info(f"Pass:{cfg.password}")
-
+logger.info(f"Email:{cfg.email}")
+logger.info(f"Pass:{cfg.password}")
+logger.info(f"Url:{cfg.smtp_url}")
+logger.info(f"Port:{cfg.smtp_port}")
 async def consume_from_queue():
     connection = await aio_pika.connect_robust(cfg.amqp_url)
     channel = await connection.channel()
@@ -69,7 +80,7 @@ async def consume_from_queue():
         msg['To'] = email_address
 
         try:
-            with smtplib.SMTP_SSL('smtp.mail.ru', 465) as smtp:
+            with smtplib.SMTP_SSL(f'{cfg.smtp_url}', cfg.smtp_port) as smtp:
                 smtp.login(f"{cfg.email}", f"{cfg.password}")
                 smtp.send_message(msg)
                 logger.info("Email успешно отправлен!")

@@ -152,7 +152,7 @@ services:
       - custom
   react-app:
     build:
-      context: ../my-app
+      context: ../Front_Project_crypto
       dockerfile: ./Dockerfile 
     ports:
       - "3000:3000" 
