@@ -114,8 +114,6 @@
 |    |—— docker-compose.yml
 |    |—— e2e
 |        |—— test.py
-|        |—— __pycache__
-|            |—— test.cpython-311.pyc
 |    |—— policy-enforcement-service
 |        |—— policies.yaml
 |—— Services
@@ -141,9 +139,6 @@
 |        |—— test
 |            |—— test.py
 |            |—— __init__.py
-|            |—— __pycache__
-|                |—— test.cpython-312.pyc
-|                |—— __init__.cpython-312.pyc
 |    |—— NotifyService
 |        |—— .env
 |        |—— app.py
@@ -159,17 +154,8 @@
 |                |—— policeconfig.py
 |                |—— requestenforcer.py
 |                |—— __init__.py
-|                |—— __pycache__
-|                    |—— policeconfig.cpython-312.pyc
-|                    |—— requestenforcer.cpython-312.pyc
-|                    |—— __init__.cpython-312.pyc
 |            |—— schemes.py
 |            |—— __init__.py
-|            |—— __pycache__
-|                |—— app.cpython-312.pyc
-|                |—— config.cpython-312.pyc
-|                |—— schemes.cpython-312.pyc
-|                |—— __init__.cpython-312.pyc
 |        |—— Dockerfile
 |        |—— policies.yaml
 |        |—— README.md
