@@ -130,8 +130,10 @@ services:
       context: ../Services/NotifyService
       dockerfile: ./DockerFile
     environment:
-      PASS: ${PASS}
-      EMAIL : ${EMAIL}
+      SMTP_EMAIL: ${SMTP_EMAIL}
+      SMTP_PASS: ${SMTP_PASS}
+      SMTP_URL: ${SMTP_URL}
+      SMTP_PORT: ${SMTP_PORT}
       AMQP: ${AMQP}
     depends_on:
        - rabbitmq
