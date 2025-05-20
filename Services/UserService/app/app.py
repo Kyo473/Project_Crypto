@@ -11,7 +11,10 @@ logging.basicConfig(
 
 app_config: config.Config = config.load_config()
 
-app = FastAPI()
+app = FastAPI(
+    version='0.0.1',
+    title='User Management Service'
+)
 
 users.inject_secrets(
     jwt_secret=app_config.jwt_secret.get_secret_value(),

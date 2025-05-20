@@ -5,6 +5,7 @@ from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, UUIDIDMixin
 from app import config
 from app.users import models, secretprovider
+from fastapi_users.exceptions import UserAlreadyExists, UserNotExists
 import pika
 cfg: config.Config = config.load_config()
 
@@ -44,6 +45,26 @@ class UserManager(UUIDIDMixin, BaseUserManager[models.User, uuid.UUID]):
         self, user: models.User, token: str, request=None
     ):
         print(f"Verification requested for user {user.id}. Verification token: {token}")
+    
+    async def create(self, user_create, safe: bool = False, **kwargs):
+        try:
+            # вызываем родительский метод
+            return await super().create(user_create, safe=safe, **kwargs)
+        except UserAlreadyExists:
+            # кастомное сообщение
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Пользователь уже существует"
+            )
+
+    async def get_by_email(self, email: str):
+        try:
+            return await super().get_by_email(email)
+        except UserNotExists:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Пользователя с такими данными не существует"
+            )
 async def get_user_manager(
     user_db=Depends(models.get_user_db),
     secret_provider: secretprovider.SecretProvider=Depends(secretprovider.get_secret_provider)

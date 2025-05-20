@@ -87,21 +87,26 @@ async def websocket_endpoint(websocket: WebSocket, path_name: str):
 @app.api_route("/{path_name:path}", methods=["GET", "DELETE", "PATCH", "POST", "PUT", "HEAD", "OPTIONS", "CONNECT", "TRACE"])
 async def catch_all(request: Request, path_name: str):
     enforce_result: EnforceResult = policy_checker.enforce(request)
+
+    # Если доступ не разрешен, проверим, была ли ошибка авторизации
     if not enforce_result.access_allowed:
-        logger.info('The user does not have enough permissions. A blocked route: %s', path_name)
-        return JSONResponse(content={'message': 'Content not found'}, status_code=404)
+        # Если токен не передан или невалиден, вернем 401 Unauthorized
+        token_data = policy_checker._RequestEnforcer__extract_token_data(request)
+        if token_data is None:
+            return JSONResponse(content={'message': 'User not authorized'}, status_code=401)
 
-    logger.info('The request will be redirected along the route: %s%s', enforce_result.redirect_service, path_name)
-    return await redirect_user_request(request, enforce_result)
+        # Если доступ запрещен по политике, можно вернуть 403 (Forbidden), но это зависит от политики
+        return JSONResponse(content={'message': 'Access denied'}, status_code=403)
 
-async def redirect_user_request(request: Request, enforce_result: EnforceResult):
+    # Если доступ разрешен, проксируем запрос к целевому сервису
+    print(enforce_result.redirect_service, path_name)
+
     client = httpx.AsyncClient(base_url=enforce_result.redirect_service)
-    url = httpx.URL(path=request.url.path,
-                    query=request.url.query.encode("utf-8"))
-    rp_req = client.build_request(request.method, url,
-                                  headers=request.headers.raw,
-                                  content=await request.body())
+    url = httpx.URL(path=request.url.path, query=request.url.query.encode("utf-8"))
+    rp_req = client.build_request(request.method, url, headers=request.headers.raw, content=await request.body())
     rp_resp = await client.send(rp_req, stream=True)
+    
+    # Возвращаем ответ от целевого сервиса
     return StreamingResponse(
         rp_resp.aiter_raw(),
         status_code=rp_resp.status_code,
