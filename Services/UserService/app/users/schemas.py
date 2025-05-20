@@ -2,9 +2,11 @@ import uuid
 from fastapi_users import schemas
 from pydantic import EmailStr ,field_validator
 from typing import Optional
+from datetime import datetime
 class UserRead(schemas.BaseUser[uuid.UUID]):
     email: EmailStr
     username: str
+    registered_at: datetime
     address:str 
     is_active: bool = True
     is_superuser: bool = False
