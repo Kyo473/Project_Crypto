@@ -20,6 +20,7 @@ def create_trade(db: Session, trade: TradeCreate) -> TradeCreate:
         seller_id = trade.seller_id,\
         seller_address = trade.seller_address,
         price = trade.price,
+        amount =trade.amount,
         currency = trade.currency,
         created_at = datetime.utcnow(),
         description = trade.description,

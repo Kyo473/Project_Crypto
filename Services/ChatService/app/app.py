@@ -92,6 +92,9 @@ async def websocket_endpoint(websocket: WebSocket, RoomID: uuid.UUID, client_id:
     except WebSocketDisconnect:
         await manager.disconnect(websocket)
         
+@app.patch("/chatroom/{chat_id}/join", tags=["ChatRoom"], response_model=ChatRead, summary="Покупатель присоединяется к чату")
+async def join_chat(chat_id: uuid.UUID, buyer_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)) -> ChatRead:
+    return await crud.join_chat_as_buyer(session=session, chat_id=chat_id, buyer_id=buyer_id)
 
 @app.get("/chat",tags=["ChatRoom"])
 def get_chat_page(request: Request):
@@ -107,7 +110,7 @@ async def get_chat(RoomID: uuid.UUID, session: AsyncSession  = Depends(get_async
     chat = await crud.get_chat(RoomID,session)
     if chat != None:
         return chat
-    return await JSONResponse(status_code=404, content={"ChatRoom:": "Item not found"})
+    return JSONResponse(status_code=404, content={"ChatRoom:": "Item not found"})
 
 @app.on_event("startup")
 async def on_startup():

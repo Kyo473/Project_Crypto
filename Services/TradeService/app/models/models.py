@@ -13,6 +13,7 @@ class trades(Base):
     buyer_address = Column(String, default='')
     seller_address = Column(String,default='')
     price = Column(Float, nullable=False)
+    amount = Column(Float, nullable=False)
     currency = Column(String, nullable=False)
     description = Column(String, default='')
     created_at = Column(TIMESTAMP, default=datetime.utcnow)

@@ -3,6 +3,7 @@ from .models import ChatRoom,Messages
 from .schemas import MessagesRead,MessagesCreate,MessagesBase,ChatRead,ChatCreate,ChatBase
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from fastapi import HTTPException
 
 async def create_chat(session: AsyncSession , chat: ChatCreate) -> ChatCreate:
     '''
@@ -10,7 +11,6 @@ async def create_chat(session: AsyncSession , chat: ChatCreate) -> ChatCreate:
     '''
     db_chat = ChatRoom(
         id = chat.id,
-        buyer_id = chat.buyer_id,
         seller_id = chat.seller_id,
     )
 
@@ -18,6 +18,25 @@ async def create_chat(session: AsyncSession , chat: ChatCreate) -> ChatCreate:
     await session.commit()
     await session.refresh(db_chat)
     return db_chat
+
+async def join_chat_as_buyer(session: AsyncSession, chat_id: uuid.UUID, buyer_id: uuid.UUID):
+    """
+    Добавляет buyer_id в существующий чат
+    """
+    result = await session.execute(select(ChatRoom).where(ChatRoom.id == chat_id))
+    chat = result.scalar_one_or_none()
+
+    if not chat:
+        raise HTTPException(status_code=404, detail="Чат не найден")
+
+    if chat.buyer_id:
+        raise HTTPException(status_code=400, detail="Покупатель уже указан в чате")
+
+    chat.buyer_id = buyer_id
+    await session.commit()
+    await session.refresh(chat)
+
+    return chat
 
 async def create_message(session: AsyncSession,message: MessagesCreate )-> MessagesCreate:
     '''

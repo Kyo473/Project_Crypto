@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 import uuid
 
 class ChatBase(BaseModel):
@@ -8,12 +9,14 @@ class ChatBase(BaseModel):
 class ChatCreate(ChatBase):
     id: uuid.UUID
     seller_id: uuid.UUID
+class ChatUpdate(ChatBase):
+    id: uuid.UUID
     buyer_id: uuid.UUID
 
 class ChatRead(ChatBase):
     id: uuid.UUID
     seller_id: uuid.UUID
-    buyer_id: uuid.UUID
+    buyer_id: Optional[uuid.UUID]
 
 class MessagesBase(BaseModel):
     message: str

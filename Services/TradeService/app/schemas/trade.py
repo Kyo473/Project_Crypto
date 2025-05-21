@@ -29,6 +29,7 @@ class TradeRead(TradeBase):
     buyer_address: str
     seller_address: str   
     price: float
+    amount: float
     currency: Currency
     created_at: datetime
     description: str
@@ -40,6 +41,7 @@ class TradeCreate(TradeBase):
     seller_id: uuid.UUID
     seller_address: str   
     price: float
+    amount: float
     currency: Currency
     description: str
     lat: float
@@ -54,6 +56,7 @@ class TradeAccept(TradeBase):
 class TradeUpdate(TradeBase):
     buyer_address :str
     price: float
+    amount: float
     currency: Currency
     description: str
     lat: float
@@ -65,6 +68,7 @@ class TradeUpdateAdmin(TradeBase):
     buyer_address: str 
     seller_address: str 
     price: float
+    amount: float
     currency: Currency
     description: str
     lat: float

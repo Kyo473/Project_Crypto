@@ -7,8 +7,8 @@ from datetime import datetime
 from app.users import database
 
 class User(SQLAlchemyBaseUserTableUUID, database.BASE):
-    email =  Column(String, nullable=False)
-    username = Column(String, nullable=False)
+    email =  Column(String, nullable=False,unique=True)
+    username = Column(String, nullable=False, unique=True)
     address =  Column(String, default  = '')
     hashed_password = Column(String, nullable=False)
     registered_at = Column(TIMESTAMP, default=datetime.utcnow)

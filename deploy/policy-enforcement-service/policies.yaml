@@ -95,6 +95,16 @@ policies:
       rule: r.sub.is_superuser == True
     
     - service: chat-service
+      resource: /chatroom/*
+      methods: (GET)|(PATCH)
+      rule: r.sub.is_superuser == False
+    - service: chat-service
+      resource: /chatroom/*
+      methods: (GET)|(PATCH)
+      rule: r.sub.is_superuser == True
+
+
+    - service: chat-service
       resource: /last_messages/*
       methods: GET
       rule: r.sub.is_superuser == False
