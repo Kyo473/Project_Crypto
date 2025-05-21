@@ -26,6 +26,8 @@ class Trade(TradeBase):
 
 class TradeRead(TradeBase):
     id: uuid.UUID
+    buyer_id: Optional[uuid.UUID]
+    seller_id: uuid.UUID
     buyer_address: str
     seller_address: str   
     price: float

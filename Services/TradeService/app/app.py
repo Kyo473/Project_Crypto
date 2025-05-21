@@ -92,7 +92,3 @@ async def find_nearest(lat: float, lon: float,db:Session = Depends(get_db)):
 async def visualize_data(db: Session = Depends(get_db)):
     crud.create_map(db=db)
     return HTMLResponse(content=open("map.html").read(), status_code=200)
-    # return RedirectResponse(url="/map")
-# @app.get("/map",tags=["Geo func"])
-# async def show_map():
-#     return HTMLResponse(content=open("map.html").read(), status_code=200)
