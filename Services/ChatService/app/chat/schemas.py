@@ -31,7 +31,7 @@ class MessagesCreate(MessagesBase):
         from_attributes = True
 
 class MessagesRead(MessagesBase):
-    id: uuid.UUID
+    send_at: datetime
     class Config:
         from_attributes = True
     
